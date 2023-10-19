@@ -25,7 +25,7 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
 
     zmq::context_t comtext(1);
     zmq::socket_t comsock(comtext, zmq::socket_type::rep);
-    std::string endpoint("tcp://localhost:" + std::to_string(5555 + client_number)); // find next available local host connection
+    std::string endpoint("tcp://*:" + std::to_string(5555 + client_number)); // find next available local host connection
     comsock.bind(endpoint.c_str());
     std::cout << "binding to " << endpoint << std::endl;
     while (1) {
@@ -54,7 +54,7 @@ void clientCreation(int *clients_connected, std::vector<std::string> *inputs, st
     std::vector<std::thread> life_extender;  
     zmq::context_t connecxt(1);
     zmq::socket_t connect_checker(connecxt, zmq::socket_type::rep);
-    connect_checker.bind("tcp://localhost:5555");
+    connect_checker.bind("tcp://*:5555");
     while (1) {
         zmq::message_t connect_req;
         auto res = connect_checker.recv(connect_req);
