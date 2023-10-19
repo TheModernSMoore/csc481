@@ -1,0 +1,5 @@
+{
+    "C_Cpp.errorSquiggles": "disabled",
+    "cmake.configureOnOpen": true,
+    "cmake.sourceDirectory": "C:/Users/themo/csc481/libzmq"
+}
