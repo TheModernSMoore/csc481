@@ -71,6 +71,10 @@ void movePhysUnaffected(float offsetX, float offsetY, Object *to_move, std::mute
     }
 }
 
+void Object::setTexturePath(std::string texture_path) {
+    tex_path = texture_path;
+}
+
 void Object::setBody(bool affected)
 {
     object_body body_toset;
@@ -90,6 +94,20 @@ void Object::move(float offsetX, float offsetY) {
     }
 }
 
+void Object::setCollisionArea()
+{
+    object_collision_area area_toset;
+    // parts of struct to set
+    collision_area = &area_toset;
+}
+
+void Object::setVisible()
+{
+    object_visible visible_toset;
+    visible_toset.identifier = visible_objects_made++;
+    visible_toset.in_frame = true; // WHEN IMPLEMENTING CAMERA AND SUCH USE THIS TO ONLY SEND (or update) OBJECTS TO (on) CLIENT
+    visible = &visible_toset;
+}
 
 
 
@@ -187,12 +205,12 @@ bool Object::isTouchingAbove(Object *other)
     return otherShape.top + otherShape.height <= thisShape.top;
 }
 
-std::string Object::toClientString()
+send_struct Object::toClientStruct() // ONLY CALL IF VISIBLE STRUCT EXISTS PLEASE :)
 {
-    if (visible) {
-        return std::string(std::to_string(visible->identifier) + ": x: " + std::to_string(getPosition().x) + ", y: " + std::to_string(getPosition().y));
-    }
-    return std::string("you stupid.");
+    sf::Color fillColor = getFillColor();
+    sf::Vector2f position = getPosition();
+    send_struct to_send = {this->visible->identifier, this->visible->in_frame, obj_size, object_type, {fillColor.r, fillColor.g, fillColor.b}, tex_path, position.x, position.y};
+    return to_send;
 }
 
 bool Object::parseString(std::string to_parse)

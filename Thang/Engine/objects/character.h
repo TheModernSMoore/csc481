@@ -9,7 +9,7 @@
 
 // Character class that will be the controlled character and is affected by Physics
 class Character : public Object
-{    
+{
     private:
         // the current speed that is kept track of
         float curr_speed = 0;
@@ -29,6 +29,8 @@ class Character : public Object
     public:
         // constructor for the character given radius, speed, acceleration, jump speed, and downwards acceleration
         Character(size_t radius, float speed, float accel, float jump_speed);
+        // constructor mainly for client use
+        Character(size_t radius);
         // sets the size of the character given the radius
         void setSize(size_t radius);
         // gets the size (raidus) of the character

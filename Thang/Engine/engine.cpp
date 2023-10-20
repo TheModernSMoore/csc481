@@ -14,14 +14,16 @@ inline bool instanceof(const T *ptr) {
 
 void clientMessaging(int client_number, std::vector<std::string> *inputs, std::mutex *m, std::vector<Character*> *characters)
 {
-    // std::unique_lock<std::mutex> initLock(*m);
     ObjectManager *objectManager = ObjectManager::get();
-    // HW3 TYPE BEAT CREATE CHARACTER TO SPAWN IN
-    // Character man(20, 5, 0.5, 10, 0.3);
-    // man.setPosition(400.f, 150.f);
-    
-    // objectManager->addObject(&man);
-    // characters->push_back(&man);
+    {
+        std::unique_lock<std::mutex> initLock(*m);
+        // HW3 TYPE BEAT CREATE CHARACTER TO SPAWN IN
+        Character man(20, 5, 0.5, 10);
+        man.setPosition(400.f, 150.f);
+        
+        objectManager->addObject(&man);
+        characters->push_back(&man);
+    }
 
     zmq::context_t comtext(1);
     zmq::socket_t comsock(comtext, zmq::socket_type::rep);
@@ -37,12 +39,17 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
             // Might be able to put all this in a seperate PUB/SUB socket just so each client isn't asking for this each time
             std::unique_lock<std::mutex> lock(*m);
             inputs->at(client_number - 1) = input_message.to_string();
-            std::vector<Object*> objects = objectManager->getObjects();
+            //                                          ONLY SEND VISIBLE OBJECTS
+            std::map<int, Object*> objects = objectManager->getVisibles();
             int size = objects.size();
             int current = 0;
-            for (auto object : objects) {
+            for (auto pair : objects) {
+                Object* object = pair.second;
                 current++;
-                comsock.send(zmq::buffer(object->toClientString()), current < size ? zmq::send_flags::sndmore : zmq::send_flags::none);
+                zmq::message_t to_send;
+                send_struct client_struct = object->toClientStruct();
+                memcpy(&to_send, &client_struct, sizeof(send_struct));
+                comsock.send(to_send, current < size ? zmq::send_flags::sndmore : zmq::send_flags::none);
             }
         }
     }
@@ -98,11 +105,7 @@ int main(int argc, char const *argv[])
 
     Platform ground(sf::Vector2f(800.f, 25.f));
     ground.setPosition(0, 600 - 25);
-    sf::Texture texture;
-    if (!texture.loadFromFile("img/grass.jpg"))
-        return -1;
- 
-    ground.setTexture(&texture);
+    ground.setTexturePath("img/grass.jpg");
     
 
     objectManager->addObject(&ground);
@@ -119,24 +122,6 @@ int main(int argc, char const *argv[])
     objectManager->addObject(&wall2);
 
     std::vector<Character*> characters;
-
-    Character man1(20, 5, 0.5, 10);
-    man1.setPosition(200.f, 150.f);
-    
-    objectManager->addObject(&man1);
-    characters.push_back(&man1);
-
-    Character man2(20, 5, 0.5, 10);
-    man2.setPosition(400.f, 150.f);
-    
-    objectManager->addObject(&man2);
-    characters.push_back(&man2);
-
-    Character man3(20, 5, 0.5, 10);
-    man3.setPosition(600.f, 150.f);
-    
-    objectManager->addObject(&man3);
-    characters.push_back(&man3);
 
 
     std::mutex m;

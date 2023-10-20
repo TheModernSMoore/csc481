@@ -3,22 +3,36 @@
 Character::Character(size_t radius ,float speed, float accel, float jump_speed)
 {
     Object::setBody(true); // physics affected body
-    this->radius = radius;
+    Object::setVisible(); // allows to be drawn
+    obj_size.radius = radius;
     this->speed = speed;
     this->accel = accel;
     this->jump_speed = jump_speed;
+    object_type = std::string("Character");
+    sf::Shape::update();
+}
+
+Character::Character(size_t radius)
+{
+    Object::setBody(true); // physics affected body
+    Object::setVisible(); // allows to be drawn
+    obj_size.radius = radius;
+    this->speed = 0;
+    this->accel = 0;
+    this->jump_speed = 0;
+    object_type = std::string("Character");
     sf::Shape::update();
 }
 
 void Character::setSize(size_t radius)
 {
-    this->radius = radius;
+    obj_size.radius = radius;
     sf::Shape::update();
 }
         
 const size_t Character::getSize() const
 {
-    return radius;
+    return obj_size.radius;
 }
         
 std::size_t Character::getPointCount() const
@@ -35,8 +49,8 @@ void Character::setPointCount(int points)
 sf::Vector2f Character::getPoint(std::size_t index) const
 {
     float angle = 2 * PI * index / points - PI/2;
-    float x = radius * cos(angle);
-    float y = radius * sin(angle);
+    float x = obj_size.radius * cos(angle);
+    float y = obj_size.radius * sin(angle);
 
     return sf::Vector2f(x, y);
 }
@@ -80,7 +94,7 @@ void Character::input(std::string direction)
     }
     ObjectManager *objectManager = ObjectManager::get();
     std::vector<Object*> objectsBelow = objectManager->touchingBelow(this);
-    std::vector<Object*> objectsAbove = objectManager->touchingAbove(this);
+    // SHOULD PROBABLY JUST HAVE A ON GROUND FUNCTION
     if (objectsBelow.size() > 0 && direction.find("u") != std::string::npos) {
         vertical_speed = jump_speed * delta_time;
         move(0, -vertical_speed);

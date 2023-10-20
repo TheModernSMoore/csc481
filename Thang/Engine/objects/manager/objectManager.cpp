@@ -22,7 +22,7 @@ std::vector<Object*> ObjectManager::objects;
 
 std::vector<Object*> ObjectManager::bodies;
 
-std::vector<Object*> ObjectManager::visibles;
+std::map<int, Object*> ObjectManager::visibles;
 
 void ObjectManager::addObject(Object *object)
 {
@@ -31,7 +31,7 @@ void ObjectManager::addObject(Object *object)
         bodies.push_back(object);
     }
     if (object->visible) {
-        visibles.push_back(object);
+        visibles.insert({object->visible->identifier, object});
     }
 }
 
@@ -40,13 +40,48 @@ void ObjectManager::removeObject(Object *object)
     objects.erase(std::remove(objects.begin(), objects.end(), object), objects.end());
     if (object->body) {
         bodies.erase(std::remove(bodies.begin(), bodies.end(), object), bodies.end());
-    } else if (object->visible) {
-        visibles.erase(std::remove(visibles.begin(), visibles.end(), object), visibles.end());
-    }
+    } 
+    // else if (object->visible) {
+    //     visibles.erase(std::remove(visibles.begin(), visibles.end(), object), visibles.end());
+    // }
 }
 
-std::vector<Object*> ObjectManager::getObjects() {
+std::vector<Object*> ObjectManager::getObjects()
+{
     return objects;
+}
+
+std::map<int, Object*> ObjectManager::getVisibles()
+{
+    return visibles;
+}
+
+Object* ObjectManager::parseObjStruct(send_struct to_parse)
+{
+    auto found = visibles.find(to_parse.identifier);
+    Object* to_change;
+    if (found == visibles.end()) {
+        if (to_parse.object_type.compare("Platform") == 0) {
+            sf::Vector2f plat_size(to_parse.obj_size.size[0], to_parse.obj_size.size[0]);
+            Platform newPlatform(plat_size);
+            to_change = &newPlatform;
+        } else {
+            Character newCharacter(to_parse.obj_size.radius);
+            to_change = &newCharacter;
+        }
+        object_visible new_visible = {to_parse.identifier, to_parse.in_frame};
+        to_change->visible = &new_visible;
+        sf::Color color(to_parse.color[0], to_parse.color[1], to_parse.color[2]);
+        to_change->setFillColor(color);
+        sf::Texture texture;
+        if (texture.loadFromFile(to_parse.img_path)) {
+            to_change->setTexture(&texture);
+        }
+    } else {
+        to_change = found->second;
+    }
+    to_change->setPosition(to_parse.xpos, to_parse.ypos);
+    return to_change;
 }
 
 // wrapper function for the threads that we create below

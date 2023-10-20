@@ -33,64 +33,6 @@ int main(int argc, char const *argv[])
     window.setPosition(sf::Vector2i(50, 50));
 
     ObjectManager *objectManager = ObjectManager::get();
-
-    Platform morb(sf::Vector2f(120.f, 25.f));
-    morb.setPosition(215.f, 250.f);
-    morb.setSpeed(0, 2);
-    morb.setRange(0, 200);
-    morb.setFillColor(sf::Color(166, 126, 18));
-
-    objectManager->addObject(&morb);
-
-    Platform borb(sf::Vector2f(120.f, 25.f));
-    borb.setPosition(375.f, 450.f);
-    borb.setSpeed(2, 0);
-    borb.setRange(200, 0);
-    borb.setFillColor(sf::Color(166, 126, 18));
-
-    objectManager->addObject(&borb);
-
-    Platform ground(sf::Vector2f(800.f, 25.f));
-    ground.setPosition(0, 600 - 25);
-    sf::Texture texture;
-    if (!texture.loadFromFile("img/grass.jpg"))
-        return -1;
- 
-    ground.setTexture(&texture);
-    
-
-    objectManager->addObject(&ground);
-
-
-    Platform wall(sf::Vector2f(25.f, 600-25));
-    wall.setPosition(100, 0);
-
-    objectManager->addObject(&wall);
-
-    Platform wall2(sf::Vector2f(25.f, 600-25));
-    wall2.setPosition(700, 0);
-    
-    objectManager->addObject(&wall2);
-
-    std::vector<Character*> characters;
-
-    Character man1(20, 5, 0.5, 10, 0.3);
-    man1.setPosition(200.f, 150.f);
-    
-    objectManager->addObject(&man1);
-    characters.push_back(&man1);
-
-    Character man2(20, 5, 0.5, 10, 0.3);
-    man2.setPosition(400.f, 150.f);
-    
-    objectManager->addObject(&man2);
-    characters.push_back(&man2);
-
-    Character man3(20, 5, 0.5, 10, 0.3);
-    man3.setPosition(600.f, 150.f);
-    
-    objectManager->addObject(&man3);
-    characters.push_back(&man3);
     
 
     zmq::context_t connecxt(1);
@@ -154,15 +96,22 @@ int main(int argc, char const *argv[])
         window.clear(sf::Color::Black);
         
 
-
-        for (auto & object : objectManager->getObjects()) {
+        //                                           DO WHILE MESSAGE MORE
+        zmq::message_t obj_msg;
+        auto res = mainket.recv(obj_msg);
+        send_struct to_parse;
+        memcpy(&to_parse, obj_msg, sizeof(send_struct));
+        window.draw(*(objectManger->parseObjStruct()));
+        while (obj_msg.more()) {
             zmq::message_t obj_msg;
             auto res = mainket.recv(obj_msg);
-            object->parseString(obj_msg.to_string());
-            window.draw(*object);
+            send_struct to_parse;
+            memcpy(&to_parse, obj_msg, sizeof(send_struct));
+            window.draw(*(objectManger->parseObjStruct()));
         }
         
         window.display();
     }
+    //                                 HANDLE DISCONNECTING HERE!!!!
     return 0;
 }

@@ -8,13 +8,19 @@ inline bool instanceof(const T *ptr) {
 Platform::Platform(sf::Vector2f size)
 {
     Object::setBody(false); // not physics affect body
-    this->m_size = size;
+    Object::setVisible();
+    obj_size.size[0] = size.x;
+    obj_size.size[1] = size.y;
+    m_size = size;
+    object_type = std::string("Platform");
     sf::Shape::update();
 }
 
 void Platform::setSize(sf::Vector2f size)
 {
-    this->m_size = size;
+    obj_size.size[0] = size.x;
+    obj_size.size[1] = size.y;
+    m_size = size;
     sf::Shape::update();
 }
         

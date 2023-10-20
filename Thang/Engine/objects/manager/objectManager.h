@@ -5,7 +5,10 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include "../abtype/object.h"
+#include "../platform.h"
+#include "../character.h"
 #include "../../timeline/timeManager.h"
+#include "../common.h"
 
 class Object;
 
@@ -18,7 +21,7 @@ class ObjectManager
 
         static std::vector<Object*> bodies;
 
-        static std::vector<Object*> visibles;
+        static std::map<int, Object*> visibles;
 
         static ObjectManager* inst;
 
@@ -38,8 +41,13 @@ class ObjectManager
         void removeObject(Object *object);
         // updates all game objects
         void updateObjects();
+        // will parse struct and if an object with the given identifier doesn't exist, it will make it
+        // then updates position of matching object and returns it to be drawn
+        Object* parseObjStruct(send_struct to_parse);
         // returns the vector of Object pointers
         std::vector<Object*> getObjects();
+        // returns the map of visible Object pointers sorted by the identifier assigned
+        std::map<int, Object*> getVisibles();
         //The five below functions just find all of the objects that are touching a certain object
         //Utilizing the isTouching function in Object
         std::vector<Object*> overlapped(Object *object);
