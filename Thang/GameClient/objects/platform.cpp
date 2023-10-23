@@ -9,7 +9,7 @@ inline bool instanceof(const T *ptr) {
 
 Platform::Platform(sf::Vector2f size)
 {
-    Object::setBody(false); // not physics affect body
+    Object::setBody(false); // not physics affected body
     Object::setVisible();
     m_size = size;
     object_type = std::string("Platform");
@@ -103,7 +103,7 @@ void Platform::logic()
 
 json Platform::toClientJSON()
 {
-    json output = Object::toClientJSON();
+    json output = clientJSONHelper();
     
     // Might have to get direction of velocity in this to send to client
     // server will handle direction changes, client will merely just move it in the chosen direction until told otherwise

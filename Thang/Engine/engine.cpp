@@ -38,27 +38,17 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
         {
             // Might be able to put all this in a seperate PUB/SUB socket just so each client isn't asking for this each time
             std::unique_lock<std::mutex> lock(*m);
-            std::cout << "JFSADLK" << std::endl;
             inputs->at(client_number - 1) = input_message.to_string();
             std::map<int, Object*> objects = objectManager->getObjects();
             int size = objects.size();
             int current = 0;
             for (auto pair : objects) {
-                std::cout << "it" << std::endl;
                 Object* object = pair.second;
-                std::cout << "it" << std::endl;
                 current++;
-                std::cout << "it" << std::endl;
-                zmq::message_t to_send;
-                std::cout << "it" << std::endl;
                 json client_json = object->toClientJSON();
-                std::cout << "it" << std::endl;
-                memcpy(&to_send, &client_json, sizeof(json));
-                std::cout << "it" << std::endl;
-                comsock.send(to_send, current < size ? zmq::send_flags::sndmore : zmq::send_flags::none);
-                std::cout << "it" << std::endl;
+                std::string to_send = to_string(client_json);
+                comsock.send(zmq::buffer(to_send), current < size ? zmq::send_flags::sndmore : zmq::send_flags::none);
             }
-            std::cout << "Gorpaple" << std::endl;
         }
     }
 }
@@ -171,9 +161,7 @@ int main(int argc, char const *argv[])
                     localTime.cycleTic();
                 }
                 if(!(localTime.isPaused())) {
-                    std::cout << "jo" << std::endl;
                     characters.at(idx++)->input(input);
-                    std::cout << "jo" << std::endl;
                 }
             }
             if(!(localTime.isPaused()))

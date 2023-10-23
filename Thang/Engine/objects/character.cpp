@@ -49,7 +49,6 @@ sf::Vector2f Character::getPoint(std::size_t index) const
 // This handles gravity
 void Character::logic()
 {
-    std::cout << "made it" << std::endl;
     TimeManager *timeManager = TimeManager::get();
     Timeline *localTime = timeManager->getTimelines().at(1);
     float delta_time = localTime->deltaTime();
@@ -64,7 +63,6 @@ void Character::logic()
     } else if (vertical_speed > TERM_VEL) {
         vertical_speed -= DOWN_ACCEL * delta_time;
     }
-    std::cout << "move problem?" << std::endl;
     move(0, TERM_VEL <= vertical_speed ? -vertical_speed * delta_time : -TERM_VEL * delta_time);
 }
 
@@ -97,7 +95,7 @@ void Character::input(std::string direction)
 json Character::toClientJSON()
 {
     // Gets generic Object JSON
-    json output = Object::toClientJSON();
+    json output = clientJSONHelper();
     output["Radius"] = radius;
     output["Speed"] = speed;
     output["Accel"] = accel;

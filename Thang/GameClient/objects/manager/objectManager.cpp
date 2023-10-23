@@ -1,5 +1,6 @@
 #include "objectManager.h"
 #include <cstdio>
+#include <iostream>
 
 template<typename Base, typename T>
 inline bool instanceof(const T *ptr) {
@@ -56,7 +57,7 @@ std::map<int, Object*> ObjectManager::getVisibles()
     return visibles;
 }
 
-Object* ObjectManager::parseObjJSON(nlohmann::json to_parse)
+bool ObjectManager::parseObjJSON(nlohmann::json to_parse)
 {  // READ JSON, IF IDENTIFIER EXISTS IN OBJ LIST, JUST UPDATE POSITION (or any other necessary componets)
 // ELSE CREATE OBJ WITH IDENTIFIER IN OBJECTS
     auto iterator_thing = objects.find(to_parse["Identifier"]);
@@ -66,29 +67,33 @@ Object* ObjectManager::parseObjJSON(nlohmann::json to_parse)
         if (type.compare("Platform") == 0) {
             // Construct Platform
             sf::Vector2f size(to_parse["Size"][0], to_parse["Size"][1]);
-            Platform platform(size);
-            platform.identifier = to_parse["Identifier"];
+            Platform *platform = new Platform(size);
+            platform->identifier = to_parse["Identifier"];
             sf::Color color(to_parse["Color"][0], to_parse["Color"][1], to_parse["Color"][2]);
-            platform.setFillColor(color);
+            platform->setFillColor(color);
             sf::Texture texture;
-            texture.loadFromFile(to_parse["Texture"]);
+            if (texture.loadFromFile(to_parse["Texture"])) {
+                platform->setTexture(&texture);
+            }
 
-            parsed = &platform;
+            parsed = platform;
             addObject(parsed);
 
         } else if (type.compare("Character") == 0) {
             // Construct Character
-            Character character(to_parse["Radius"], to_parse["Speed"], to_parse["Accel"], to_parse["JumpSpeed"]);
-            character.identifier = to_parse["Identifier"];
+            Character *character = new Character(to_parse["Radius"], to_parse["Speed"], to_parse["Accel"], to_parse["JumpSpeed"]);
+            character->identifier = to_parse["Identifier"];
             sf::Color color(to_parse["Color"][0], to_parse["Color"][1], to_parse["Color"][2]);
-            character.setFillColor(color);
+            character->setFillColor(color);
             sf::Texture texture;
-            texture.loadFromFile(to_parse["Texture"]);
+            if (texture.loadFromFile(to_parse["Texture"])) {
+                character->setTexture(&texture);
+            }
 
-            parsed = &character;
+            parsed = character;
             addObject(parsed);
         } else {
-            // DO NOTHING FOR NOW IDK IF CHANGE OR WHA
+            return false;
         }
     } else {
         parsed = iterator_thing->second;
@@ -96,15 +101,15 @@ Object* ObjectManager::parseObjJSON(nlohmann::json to_parse)
     float x = to_parse["Position"][0];
     float y = to_parse["Position"][1];
     parsed->setPosition(x, y);
-    return parsed;
+    return true;
     
 }
 
 // wrapper function for the threads that we create below
 void ObjectManager::physicsLogicWrapper()
 {
-    for(auto & [key, physics] : bodies) {
-        physics->logic();//                       TODO CHANGE THIS
+    for(auto & [key, physics] : objects) {
+        physics->logic();   //                   Seg faults explicitly on call to character->logic()
     }
 }
 

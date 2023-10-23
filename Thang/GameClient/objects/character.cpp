@@ -1,4 +1,5 @@
 #include "character.h"
+#include <iostream>
 
 using json = nlohmann::json;
 
@@ -94,7 +95,7 @@ void Character::input(std::string direction)
 json Character::toClientJSON()
 {
     // Gets generic Object JSON
-    json output = Object::toClientJSON();
+    json output = clientJSONHelper();
     output["Radius"] = radius;
     output["Speed"] = speed;
     output["Accel"] = accel;

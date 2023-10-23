@@ -207,7 +207,9 @@ bool Object::isTouchingAbove(Object *other)
     return otherShape.top + otherShape.height <= thisShape.top;
 }
 
-json Object::toClientJSON() {
+json Object::toClientJSON() { return nullptr;}
+
+json Object::clientJSONHelper() {
     json output;
     output["Type"] = object_type;
     output["Identifier"] = identifier;

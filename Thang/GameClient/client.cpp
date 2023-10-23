@@ -99,23 +99,23 @@ int main(int argc, char const *argv[])
         
 
         // Get json, and check if they have more messages to keep reading more input
-        zmq::message_t obj_msg;
-        auto res = mainket.recv(obj_msg);
-        json to_parse;
-        memcpy(&to_parse, &obj_msg, sizeof(json));
-        Object *parsed = objectManager->parseObjJSON(to_parse);
-        if (parsed->visible) {
-            window.draw(*parsed);
-        }
-        while (obj_msg.more()) {
+        bool more = true;
+        while (more) {
             zmq::message_t obj_msg;
+            std::cout << "p" << std::endl;
             auto res = mainket.recv(obj_msg);
-            json to_parse;
-            memcpy(&to_parse, &obj_msg, sizeof(json));
-            Object *parsed = objectManager->parseObjJSON(to_parse);
-            if (parsed->visible) {
-                window.draw(*parsed);
+            std::cout << obj_msg.to_string() << std::endl;
+            json to_parse = json::parse(obj_msg.to_string());
+            std::cout << "r" << std::endl;
+            if (objectManager->parseObjJSON(to_parse)) {
+                std::cout << "cringe" << std::endl;
             }
+            std::cout << "s" << std::endl;
+            more = obj_msg.more();
+            std::cout << "e" << std::endl;
+        }
+        for (auto & [ident, object] : objectManager->getVisibles()) {
+            window.draw(*object);
         }
         
         window.display();

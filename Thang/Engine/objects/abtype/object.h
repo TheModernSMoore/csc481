@@ -32,6 +32,8 @@ class Object : public sf::Shape
         // Could be in visible struct as well as color
         std::string tex_path;
 
+        nlohmann::json clientJSONHelper();
+
     public:
         int identifier;
 
@@ -60,7 +62,7 @@ class Object : public sf::Shape
         //Checks if other is above this and touching.
         bool isTouchingAbove(Object *other);
         // Makes json info to be used for sending to client
-        nlohmann::json toClientJSON();
+        virtual nlohmann::json toClientJSON() = 0;
         //abstract function logic that all objects will have (all stuff that happens before draw)
         virtual void logic() = 0;
         // Overwrites move and does different behavior based off of components
