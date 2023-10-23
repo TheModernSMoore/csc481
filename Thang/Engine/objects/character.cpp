@@ -1,10 +1,13 @@
 #include "character.h"
+#include <iostream>
+
+using json = nlohmann::json;
 
 Character::Character(size_t radius ,float speed, float accel, float jump_speed)
 {
     Object::setBody(true); // physics affected body
     Object::setVisible(); // allows to be drawn
-    obj_size.radius = radius;
+    radius = radius;
     this->speed = speed;
     this->accel = accel;
     this->jump_speed = jump_speed;
@@ -12,27 +15,15 @@ Character::Character(size_t radius ,float speed, float accel, float jump_speed)
     sf::Shape::update();
 }
 
-Character::Character(size_t radius)
-{
-    Object::setBody(true); // physics affected body
-    Object::setVisible(); // allows to be drawn
-    obj_size.radius = radius;
-    this->speed = 0;
-    this->accel = 0;
-    this->jump_speed = 0;
-    object_type = std::string("Character");
-    sf::Shape::update();
-}
-
 void Character::setSize(size_t radius)
 {
-    obj_size.radius = radius;
+    radius = radius;
     sf::Shape::update();
 }
         
 const size_t Character::getSize() const
 {
-    return obj_size.radius;
+    return radius;
 }
         
 std::size_t Character::getPointCount() const
@@ -49,8 +40,8 @@ void Character::setPointCount(int points)
 sf::Vector2f Character::getPoint(std::size_t index) const
 {
     float angle = 2 * PI * index / points - PI/2;
-    float x = obj_size.radius * cos(angle);
-    float y = obj_size.radius * sin(angle);
+    float x = radius * cos(angle);
+    float y = radius * sin(angle);
 
     return sf::Vector2f(x, y);
 }
@@ -58,6 +49,7 @@ sf::Vector2f Character::getPoint(std::size_t index) const
 // This handles gravity
 void Character::logic()
 {
+    std::cout << "made it" << std::endl;
     TimeManager *timeManager = TimeManager::get();
     Timeline *localTime = timeManager->getTimelines().at(1);
     float delta_time = localTime->deltaTime();
@@ -72,6 +64,7 @@ void Character::logic()
     } else if (vertical_speed > TERM_VEL) {
         vertical_speed -= DOWN_ACCEL * delta_time;
     }
+    std::cout << "move problem?" << std::endl;
     move(0, TERM_VEL <= vertical_speed ? -vertical_speed * delta_time : -TERM_VEL * delta_time);
 }
 
@@ -99,4 +92,16 @@ void Character::input(std::string direction)
         vertical_speed = jump_speed * delta_time;
         move(0, -vertical_speed);
     }
+}
+
+json Character::toClientJSON()
+{
+    // Gets generic Object JSON
+    json output = Object::toClientJSON();
+    output["Radius"] = radius;
+    output["Speed"] = speed;
+    output["Accel"] = accel;
+    output["JumpSpeed"] = jump_speed;
+    return output;
+    
 }

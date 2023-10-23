@@ -2,11 +2,10 @@
 #include <vector>
 #include <typeinfo>
 #include <thread>
-#include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include "../abtype/object.h"
-#include "../platform.h"
 #include "../character.h"
+#include "../platform.h"
 #include "../../timeline/timeManager.h"
 #include "../common.h"
 
@@ -17,9 +16,9 @@ class ObjectManager
 {   
     private:
         /// the static list of game objects
-        static std::vector<Object*> objects;
+        static std::map<int, Object*> objects;
 
-        static std::vector<Object*> bodies;
+        static std::map<int, Object*> bodies;
 
         static std::map<int, Object*> visibles;
 
@@ -41,11 +40,11 @@ class ObjectManager
         void removeObject(Object *object);
         // updates all game objects
         void updateObjects();
-        // will parse struct and if an object with the given identifier doesn't exist, it will make it
-        // then updates position of matching object and returns it to be drawn
-        Object* parseObjStruct(send_struct to_parse);
+        // will parse json and if an object with the given identifier doesn't exist, it will make it
+        // then updates position of matching object and returns it
+        Object* parseObjJSON(nlohmann::json to_parse);
         // returns the vector of Object pointers
-        std::vector<Object*> getObjects();
+        std::map<int, Object*> getObjects();
         // returns the map of visible Object pointers sorted by the identifier assigned
         std::map<int, Object*> getVisibles();
         //The five below functions just find all of the objects that are touching a certain object

@@ -46,5 +46,7 @@ class Platform : public Object
         void setPauseTime(float pause);
 
         virtual void logic();
+        // Makes json info to be used for sending to client
+        virtual nlohmann::json toClientJSON();
 
 };

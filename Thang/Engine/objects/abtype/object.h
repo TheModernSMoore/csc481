@@ -1,10 +1,10 @@
 #pragma once
 #include <limits>
 #include <mutex>
-#include "../manager/objectManager.h"
 #include <SFML/Graphics/Shape.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include "../common.h"
+#include <nlohmann/json.hpp>
 
 #define DOWN_ACCEL 0.3
 #define TERM_VEL -6
@@ -15,7 +15,7 @@ class Object : public sf::Shape
     friend class objectManager;
     private:
         // Keeps track of how many drawable objects have been made (those sent to client) in order to make unique identifier
-        static int visible_objects_made;
+        static int objects_made;
 
     protected:
         // the mutex used for safe movement in all objects, hence protected and static
@@ -29,11 +29,11 @@ class Object : public sf::Shape
 
         std::string object_type;
 
+        // Could be in visible struct as well as color
         std::string tex_path;
 
-        size obj_size;
-
     public:
+        int identifier;
 
         object_body *body;
 
@@ -59,10 +59,8 @@ class Object : public sf::Shape
         bool isTouchingRight(Object *other);
         //Checks if other is above this and touching.
         bool isTouchingAbove(Object *other);
-        // Makes string info to be used for sending to client
-        send_struct toClientStruct();
-        // Utilizes the above string to position the object (if able, returns false if not)
-        bool parseString(std::string to_parse);
+        // Makes json info to be used for sending to client
+        nlohmann::json toClientJSON();
         //abstract function logic that all objects will have (all stuff that happens before draw)
         virtual void logic() = 0;
         // Overwrites move and does different behavior based off of components

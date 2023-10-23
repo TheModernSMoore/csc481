@@ -7,6 +7,8 @@
 #include "objects/character.h"
 #include "timeline/timeManager.h"
 
+using json = nlohmann::json;
+
 template<typename Base, typename T>
 inline bool instanceof(const T *ptr) {
    return dynamic_cast<const Base*>(ptr) != nullptr;
@@ -96,18 +98,24 @@ int main(int argc, char const *argv[])
         window.clear(sf::Color::Black);
         
 
-        //                                           DO WHILE MESSAGE MORE
+        // Get json, and check if they have more messages to keep reading more input
         zmq::message_t obj_msg;
         auto res = mainket.recv(obj_msg);
-        send_struct to_parse;
-        memcpy(&to_parse, obj_msg, sizeof(send_struct));
-        window.draw(*(objectManger->parseObjStruct()));
+        json to_parse;
+        memcpy(&to_parse, &obj_msg, sizeof(json));
+        Object *parsed = objectManager->parseObjJSON(to_parse);
+        if (parsed->visible) {
+            window.draw(*parsed);
+        }
         while (obj_msg.more()) {
             zmq::message_t obj_msg;
             auto res = mainket.recv(obj_msg);
-            send_struct to_parse;
-            memcpy(&to_parse, obj_msg, sizeof(send_struct));
-            window.draw(*(objectManger->parseObjStruct()));
+            json to_parse;
+            memcpy(&to_parse, &obj_msg, sizeof(json));
+            Object *parsed = objectManager->parseObjJSON(to_parse);
+            if (parsed->visible) {
+                window.draw(*parsed);
+            }
         }
         
         window.display();

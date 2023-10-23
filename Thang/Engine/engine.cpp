@@ -7,6 +7,8 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
+using json = nlohmann::json;
+
 template<typename Base, typename T>
 inline bool instanceof(const T *ptr) {
    return dynamic_cast<const Base*>(ptr) != nullptr;
@@ -14,15 +16,15 @@ inline bool instanceof(const T *ptr) {
 
 void clientMessaging(int client_number, std::vector<std::string> *inputs, std::mutex *m, std::vector<Character*> *characters)
 {
+    Character man(20, 5, 0.5, 10);
+    man.setPosition(400.f, 150.f);
     ObjectManager *objectManager = ObjectManager::get();
     {
         std::unique_lock<std::mutex> initLock(*m);
-        // HW3 TYPE BEAT CREATE CHARACTER TO SPAWN IN
-        Character man(20, 5, 0.5, 10);
-        man.setPosition(400.f, 150.f);
-        
+        // HW3 TYPE BEAT CREATE CHARACTER TO SPAWN IN       
         objectManager->addObject(&man);
         characters->push_back(&man);
+        inputs->push_back(std::string("")); // this will be at clients_connected - 1
     }
 
     zmq::context_t comtext(1);
@@ -32,25 +34,31 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
     std::cout << "binding to " << endpoint << std::endl;
     while (1) {
         zmq::message_t input_message;
-        // std::vector<Character> real_characters;
-        // std::vector<Platform> real_platforms;
         auto res = comsock.recv(input_message);
         {
             // Might be able to put all this in a seperate PUB/SUB socket just so each client isn't asking for this each time
             std::unique_lock<std::mutex> lock(*m);
+            std::cout << "JFSADLK" << std::endl;
             inputs->at(client_number - 1) = input_message.to_string();
-            //                                          ONLY SEND VISIBLE OBJECTS
-            std::map<int, Object*> objects = objectManager->getVisibles();
+            std::map<int, Object*> objects = objectManager->getObjects();
             int size = objects.size();
             int current = 0;
             for (auto pair : objects) {
+                std::cout << "it" << std::endl;
                 Object* object = pair.second;
+                std::cout << "it" << std::endl;
                 current++;
+                std::cout << "it" << std::endl;
                 zmq::message_t to_send;
-                send_struct client_struct = object->toClientStruct();
-                memcpy(&to_send, &client_struct, sizeof(send_struct));
+                std::cout << "it" << std::endl;
+                json client_json = object->toClientJSON();
+                std::cout << "it" << std::endl;
+                memcpy(&to_send, &client_json, sizeof(json));
+                std::cout << "it" << std::endl;
                 comsock.send(to_send, current < size ? zmq::send_flags::sndmore : zmq::send_flags::none);
+                std::cout << "it" << std::endl;
             }
+            std::cout << "Gorpaple" << std::endl;
         }
     }
 }
@@ -68,7 +76,6 @@ void clientCreation(int *clients_connected, std::vector<std::string> *inputs, st
         {
             std::unique_lock<std::mutex> lock(*m);
             (*clients_connected) ++;
-            inputs->push_back(std::string("")); // this will be at clients_connected - 1
         }
         // MUST EXTEND THIS THREADS LIFE
         life_extender.push_back(std::thread(clientMessaging, *clients_connected, inputs, m, characters));
@@ -163,13 +170,15 @@ int main(int argc, char const *argv[])
                     input.erase(place, 1);
                     localTime.cycleTic();
                 }
-                if(!(localTime.isPaused()))
+                if(!(localTime.isPaused())) {
+                    std::cout << "jo" << std::endl;
                     characters.at(idx++)->input(input);
+                    std::cout << "jo" << std::endl;
+                }
             }
             if(!(localTime.isPaused()))
                 objectManager->updateObjects();
         }
-
     }
     return 0;
 }

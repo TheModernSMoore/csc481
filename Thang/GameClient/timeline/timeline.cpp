@@ -28,7 +28,6 @@ void Timeline::setTime()
 {
     last_time = current_time;
     if (anchor) {
-        // anchor->setTime(); We should be setting time for server seperately to clients, clients just grab servertime
         current_time = (anchor->getCurrentTime() - start_time) / tic;
         if (!paused) {
             delt_idx = (delt_idx + 1) % W;

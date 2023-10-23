@@ -1,6 +1,5 @@
 #include "objectManager.h"
 #include <cstdio>
-#include <iostream>
 
 template<typename Base, typename T>
 inline bool instanceof(const T *ptr) {
@@ -104,8 +103,8 @@ Object* ObjectManager::parseObjJSON(nlohmann::json to_parse)
 // wrapper function for the threads that we create below
 void ObjectManager::physicsLogicWrapper()
 {
-    for(auto & [key, physics] : objects) {
-        physics->logic();   //                   Seg faults explicitly on call to character->logic()
+    for(auto & [key, physics] : bodies) {
+        physics->logic();//                       TODO CHANGE THIS
     }
 }
 

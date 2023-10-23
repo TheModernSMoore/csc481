@@ -1,5 +1,7 @@
 #include "platform.h"
 
+using json = nlohmann::json;
+
 template<typename Base, typename T>
 inline bool instanceof(const T *ptr) {
    return dynamic_cast<const Base*>(ptr) != nullptr;
@@ -7,10 +9,8 @@ inline bool instanceof(const T *ptr) {
 
 Platform::Platform(sf::Vector2f size)
 {
-    Object::setBody(false); // not physics affect body
+    Object::setBody(false); // not physics affected body
     Object::setVisible();
-    obj_size.size[0] = size.x;
-    obj_size.size[1] = size.y;
     m_size = size;
     object_type = std::string("Platform");
     sf::Shape::update();
@@ -18,8 +18,6 @@ Platform::Platform(sf::Vector2f size)
 
 void Platform::setSize(sf::Vector2f size)
 {
-    obj_size.size[0] = size.x;
-    obj_size.size[1] = size.y;
     m_size = size;
     sf::Shape::update();
 }
@@ -101,4 +99,18 @@ void Platform::logic()
         }
     }
     sf::Shape::update();
+}
+
+json Platform::toClientJSON()
+{
+    json output = Object::toClientJSON();
+    
+    // Might have to get direction of velocity in this to send to client
+    // server will handle direction changes, client will merely just move it in the chosen direction until told otherwise
+    output["Size"] = {m_size.x, m_size.y};
+    output["SpeedX"] = speedx;
+    output["SpeedY"] = speedy;
+
+    return output;
+    
 }

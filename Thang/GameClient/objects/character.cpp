@@ -1,17 +1,22 @@
 #include "character.h"
 
-Character::Character(size_t radius ,float speed, float accel, float jump_speed, float down_accel) : PhysicsAffected(down_accel)
+using json = nlohmann::json;
+
+Character::Character(size_t radius ,float speed, float accel, float jump_speed)
 {
-    this->radius = radius;
+    Object::setBody(true); // physics affected body
+    Object::setVisible(); // allows to be drawn
+    radius = radius;
     this->speed = speed;
     this->accel = accel;
     this->jump_speed = jump_speed;
+    object_type = std::string("Character");
     sf::Shape::update();
 }
 
 void Character::setSize(size_t radius)
 {
-    this->radius = radius;
+    radius = radius;
     sf::Shape::update();
 }
         
@@ -51,13 +56,13 @@ void Character::logic()
     std::vector<Object*> objectsBelow = objectManager->touchingBelow(this);
     std::vector<Object*> objectsAbove = objectManager->touchingAbove(this);
     if (objectsAbove.size() > 0) {
-        vertical_speed = -down_accel * delta_time;
+        vertical_speed = -DOWN_ACCEL * delta_time;
     } else if (objectsBelow.size() > 0) {
-        vertical_speed = -down_accel * delta_time;
-    } else if (vertical_speed > term_vel) {
-        vertical_speed -= down_accel * delta_time;
+        vertical_speed = -DOWN_ACCEL * delta_time;
+    } else if (vertical_speed > TERM_VEL) {
+        vertical_speed -= DOWN_ACCEL * delta_time;
     }
-    move(0, term_vel <= vertical_speed ? -vertical_speed * delta_time : -term_vel * delta_time);
+    move(0, TERM_VEL <= vertical_speed ? -vertical_speed * delta_time : -TERM_VEL * delta_time);
 }
 
 // This handles all input and corresponding movement
@@ -79,9 +84,21 @@ void Character::input(std::string direction)
     }
     ObjectManager *objectManager = ObjectManager::get();
     std::vector<Object*> objectsBelow = objectManager->touchingBelow(this);
-    std::vector<Object*> objectsAbove = objectManager->touchingAbove(this);
+    // SHOULD PROBABLY JUST HAVE A ON GROUND FUNCTION
     if (objectsBelow.size() > 0 && direction.find("u") != std::string::npos) {
         vertical_speed = jump_speed * delta_time;
         move(0, -vertical_speed);
     }
+}
+
+json Character::toClientJSON()
+{
+    // Gets generic Object JSON
+    json output = Object::toClientJSON();
+    output["Radius"] = radius;
+    output["Speed"] = speed;
+    output["Accel"] = accel;
+    output["JumpSpeed"] = jump_speed;
+    return output;
+    
 }

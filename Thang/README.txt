@@ -21,3 +21,6 @@ YOU WILL HAVE TO CTRL-C TO TERMINATE BOTH server AND client
 
 ----------------------------------------------------------------------
 grass texture - https://www.textures4photoshop.com/tex/nature-grass-and-foliage/grass-texture-seamless-for-free.aspx
+
+json capabilities installed with command - sudo apt-get install nlohmann-json3-dev
+zmq capabilities installed with command - sudo apt-get install libzmq3-dev

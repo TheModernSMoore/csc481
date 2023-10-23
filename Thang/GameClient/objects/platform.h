@@ -1,10 +1,11 @@
 #pragma once
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
-#include "physics/objectManager.h"
+#include "manager/objectManager.h"
+#include "abtype/object.h"
 
 // The platform class, acts as the ground, floating platforms, walls, so on for character to interact with
-class Platform : public Generic
+class Platform : public Object
 {
     private:
         // speed of platform in x direction
@@ -45,5 +46,7 @@ class Platform : public Generic
         void setPauseTime(float pause);
 
         virtual void logic();
+        // Makes json info to be used for sending to client
+        virtual nlohmann::json toClientJSON();
 
 };

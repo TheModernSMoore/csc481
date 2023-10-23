@@ -1,19 +1,24 @@
 #include "platform.h"
 
+using json = nlohmann::json;
+
 template<typename Base, typename T>
 inline bool instanceof(const T *ptr) {
    return dynamic_cast<const Base*>(ptr) != nullptr;
 }
 
-Platform::Platform(sf::Vector2f size) : Generic()
+Platform::Platform(sf::Vector2f size)
 {
-    this->m_size = size;
+    Object::setBody(false); // not physics affect body
+    Object::setVisible();
+    m_size = size;
+    object_type = std::string("Platform");
     sf::Shape::update();
 }
 
 void Platform::setSize(sf::Vector2f size)
 {
-    this->m_size = size;
+    m_size = size;
     sf::Shape::update();
 }
         
@@ -84,7 +89,7 @@ void Platform::logic()
             move(speedx * delta_time, speedy * delta_time);
             //I think this kind of check is ok to not be immediately reliant, could be cringe
             ObjectManager *objectManager = ObjectManager::get();
-            std::vector<PhysicsAffected*> objectsAbove = objectManager->touchingPhysicsAbove(this);
+            std::vector<Object*> objectsAbove = objectManager->touchingPhysicsAbove(this);
             for (auto & object : objectsAbove) {
                 object->move(speedx * delta_time, speedy * delta_time);
             }
@@ -94,4 +99,18 @@ void Platform::logic()
         }
     }
     sf::Shape::update();
+}
+
+json Platform::toClientJSON()
+{
+    json output = Object::toClientJSON();
+    
+    // Might have to get direction of velocity in this to send to client
+    // server will handle direction changes, client will merely just move it in the chosen direction until told otherwise
+    output["Size"] = {m_size.x, m_size.y};
+    output["SpeedX"] = speedx;
+    output["SpeedY"] = speedy;
+
+    return output;
+    
 }

@@ -23,14 +23,14 @@ class Character : public Object
         float vertical_speed = 0;
         // the radius of the character (circle)
         float radius;
+
+    public:
         // the number of points the character has (for constructing the circle)
         int points = 30;
 
-    public:
+        
         // constructor for the character given radius, speed, acceleration, jump speed, and downwards acceleration
         Character(size_t radius, float speed, float accel, float jump_speed);
-        // constructor mainly for client use
-        Character(size_t radius);
         // sets the size of the character given the radius
         void setSize(size_t radius);
         // gets the size (raidus) of the character
@@ -45,5 +45,6 @@ class Character : public Object
         void input(std::string direction);
         // the logic function required by Object to handle player input and movement
         virtual void logic();
-
+        // Makes json info to be used for sending to client
+        virtual nlohmann::json toClientJSON();
 };
