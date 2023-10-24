@@ -16,14 +16,15 @@ inline bool instanceof(const T *ptr) {
 
 void clientMessaging(int client_number, std::vector<std::string> *inputs, std::mutex *m, std::vector<Character*> *characters)
 {
-    Character man(20, 5, 0.5, 10);
-    man.setPosition(400.f, 150.f);
     ObjectManager *objectManager = ObjectManager::get();
     {
         std::unique_lock<std::mutex> initLock(*m);
-        // HW3 TYPE BEAT CREATE CHARACTER TO SPAWN IN       
-        objectManager->addObject(&man);
-        characters->push_back(&man);
+        Character *man = new Character(20, 5, 0.5, 10);
+        man->setPosition(400.f, 150.f);
+
+
+        objectManager->addObject(man);
+        characters->push_back(man);
         inputs->push_back(std::string("")); // this will be at clients_connected - 1
     }
 
@@ -75,6 +76,11 @@ void clientCreation(int *clients_connected, std::vector<std::string> *inputs, st
 
 int main(int argc, char const *argv[])
 {
+    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Window", sf::Style::Resize);
+    // change the position of the window (relatively to the desktop)
+    window.setPosition(sf::Vector2i(50, 50));
+
+
     TimeManager *timeManager = TimeManager::get();
     Timeline realTime = Timeline();
     Timeline localTime = Timeline(&realTime, 65000);
@@ -166,6 +172,13 @@ int main(int argc, char const *argv[])
             }
             if(!(localTime.isPaused()))
                 objectManager->updateObjects();
+
+            window.clear(sf::Color::Black);
+
+            for (auto & [key, value] : objectManager->getVisibles()) {
+                window.draw(*value);
+            }
+            window.display();
         }
     }
     return 0;

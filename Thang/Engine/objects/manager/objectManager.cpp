@@ -57,6 +57,11 @@ std::map<int, Object*> ObjectManager::getVisibles()
     return visibles;
 }
 
+std::map<int, Object*> ObjectManager::getBodies()
+{
+    return bodies;
+}
+
 bool ObjectManager::parseObjJSON(nlohmann::json to_parse)
 {  // READ JSON, IF IDENTIFIER EXISTS IN OBJ LIST, JUST UPDATE POSITION (or any other necessary componets)
 // ELSE CREATE OBJ WITH IDENTIFIER IN OBJECTS
@@ -71,9 +76,10 @@ bool ObjectManager::parseObjJSON(nlohmann::json to_parse)
             platform->identifier = to_parse["Identifier"];
             sf::Color color(to_parse["Color"][0], to_parse["Color"][1], to_parse["Color"][2]);
             platform->setFillColor(color);
-            sf::Texture texture;
-            if (texture.loadFromFile(to_parse["Texture"])) {
-                platform->setTexture(&texture);
+            sf::Texture *texture = new sf::Texture;
+            std::string tex_path(to_parse["Texture"]);
+            if (tex_path.compare(std::string("")) !=0 && texture->loadFromFile(tex_path)) {
+                platform->setTexture(texture);
             }
 
             parsed = platform;
@@ -85,9 +91,10 @@ bool ObjectManager::parseObjJSON(nlohmann::json to_parse)
             character->identifier = to_parse["Identifier"];
             sf::Color color(to_parse["Color"][0], to_parse["Color"][1], to_parse["Color"][2]);
             character->setFillColor(color);
-            sf::Texture texture;
-            if (texture.loadFromFile(to_parse["Texture"])) {
-                character->setTexture(&texture);
+            sf::Texture *texture = new sf::Texture;
+            std::string tex_path(to_parse["Texture"]);
+            if (tex_path.compare(std::string("")) !=0 && texture->loadFromFile(tex_path)) {
+                character->setTexture(texture);
             }
 
             parsed = character;
@@ -299,6 +306,7 @@ std::vector<Object*> ObjectManager::overlappedBodies(Object *object)
     for (auto & [key, other] : bodies)
     {
         if (other != object && object->isOverlapped(other)) {
+            std::cout << "dkal" << std::endl;
             touchers.push_back(other);
         }
     }

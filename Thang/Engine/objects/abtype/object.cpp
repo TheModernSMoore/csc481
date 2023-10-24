@@ -80,9 +80,8 @@ void Object::setTexturePath(std::string texture_path) {
 
 void Object::setBody(bool affected)
 {
-    object_body body_toset;
-    body_toset.physicsAffected = affected;
-    body = &body_toset;
+    body = new object_body;
+    body->physicsAffected = affected;
 }
 
 void Object::move(float offsetX, float offsetY) {
@@ -99,16 +98,14 @@ void Object::move(float offsetX, float offsetY) {
 
 void Object::setCollisionArea()
 {
-    object_collision_area area_toset;
     // parts of struct to set
-    collision_area = &area_toset;
+    collision_area = new object_collision_area;
 }
 
 void Object::setVisible()
 {
-    object_visible visible_toset;
-    visible_toset.in_frame = true; // WHEN IMPLEMENTING CAMERA AND SUCH USE THIS TO ONLY SEND (or update) OBJECTS TO (on) CLIENT
-    visible = &visible_toset;
+    visible = new object_visible;
+    visible->in_frame = true;
 }
 
 
@@ -119,8 +116,8 @@ void Object::logic() {}
 
 bool Object::isOverlapped(Object *other)
 {
-    sf::Rect<float> shape1 = Shape::getGlobalBounds();
-    sf::Rect<float> shape2 = other->Shape::getGlobalBounds();
+    sf::Rect<float> shape1 = this->getGlobalBounds();
+    sf::Rect<float> shape2 = other->getGlobalBounds();
     return shape1.intersects(shape2);
 }
 

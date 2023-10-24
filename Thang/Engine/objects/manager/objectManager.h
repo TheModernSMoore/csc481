@@ -47,6 +47,8 @@ class ObjectManager
         std::map<int, Object*> getObjects();
         // returns the map of visible Object pointers sorted by the identifier assigned
         std::map<int, Object*> getVisibles();
+
+        std::map<int, Object*> getBodies();
         //The five below functions just find all of the objects that are touching a certain object
         //Utilizing the isTouching function in Object
         std::vector<Object*> overlapped(Object *object);

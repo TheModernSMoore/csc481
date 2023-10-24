@@ -102,17 +102,11 @@ int main(int argc, char const *argv[])
         bool more = true;
         while (more) {
             zmq::message_t obj_msg;
-            std::cout << "p" << std::endl;
             auto res = mainket.recv(obj_msg);
-            std::cout << obj_msg.to_string() << std::endl;
             json to_parse = json::parse(obj_msg.to_string());
-            std::cout << "r" << std::endl;
-            if (objectManager->parseObjJSON(to_parse)) {
-                std::cout << "cringe" << std::endl;
-            }
-            std::cout << "s" << std::endl;
+            std::cout << obj_msg.to_string() << std::endl;
+            objectManager->parseObjJSON(to_parse);
             more = obj_msg.more();
-            std::cout << "e" << std::endl;
         }
         for (auto & [ident, object] : objectManager->getVisibles()) {
             window.draw(*object);
