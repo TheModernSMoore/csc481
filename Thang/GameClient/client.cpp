@@ -92,6 +92,7 @@ int main(int argc, char const *argv[])
             input += getInput();
         }
 
+        // MAYBE DO SIMILAR THING THAT SERVER DOES WHERE WE HAVE A SEPERATE THREAD THAT HANDLES INTERACTIONS THROUGH THE SOCKETS THEN HAVE CLIENT CALCULATIONS DONE IN MAIN
         mainket.send(zmq::buffer(input));
 
         // clear the window with black color
@@ -104,11 +105,9 @@ int main(int argc, char const *argv[])
             zmq::message_t obj_msg;
             auto res = mainket.recv(obj_msg);
             json to_parse = json::parse(obj_msg.to_string());
-            std::cout << obj_msg.to_string() << std::endl;
             objectManager->parseObjJSON(to_parse);
             more = obj_msg.more();
         }
-        std::cout << objectManager->getVisibles().size() << std::endl;
         for (auto & [ident, object] : objectManager->getVisibles()) {
             window.draw(*object);
         }

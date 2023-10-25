@@ -5,6 +5,7 @@
 #include <SFML/Graphics/Rect.hpp>
 #include "../common.h"
 #include <nlohmann/json.hpp>
+#include <cmath>
 
 #define DOWN_ACCEL 0.3
 #define TERM_VEL -6

@@ -2,6 +2,7 @@
 
 typedef struct object_body {
     bool physicsAffected;
+    sf::Vector2f velocity;
     // void move(float offsetX, float offsetY);
 } object_body;
 

@@ -92,16 +92,22 @@ int main(int argc, char const *argv[])
 
     Platform morb(sf::Vector2f(120.f, 25.f));
     morb.setPosition(215.f, 250.f);
-    morb.setSpeed(0, 2);
-    morb.setRange(0, 200);
+    std::vector<sf::Vector2f> morb_set;
+    morb_set.push_back(sf::Vector2f(215.f, 450.f));
+    morb_set.push_back(sf::Vector2f(215.f, 250.f));
+    morb.setToGo(morb_set);
+    morb.setSpeed(2);
     morb.setFillColor(sf::Color(166, 126, 18));
 
     objectManager->addObject(&morb);
 
     Platform borb(sf::Vector2f(120.f, 25.f));
     borb.setPosition(375.f, 450.f);
-    borb.setSpeed(2, 0);
-    borb.setRange(200, 0);
+    std::vector<sf::Vector2f> borb_set;
+    borb_set.push_back(sf::Vector2f(575.f, 450.f));
+    borb_set.push_back(sf::Vector2f(375.f, 450.f));
+    borb.setToGo(borb_set);
+    borb.setSpeed(2);
     borb.setFillColor(sf::Color(166, 126, 18));
 
     objectManager->addObject(&borb);

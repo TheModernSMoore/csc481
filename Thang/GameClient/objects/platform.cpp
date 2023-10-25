@@ -48,54 +48,50 @@ sf::Vector2f Platform::getPoint(std::size_t index) const
     }
 }
 
-void Platform::setSpeed(float speedx, float speedy)
+void Platform::setSpeed(float speed) // PUT VECTORS HERE TOO
 {
-    this->speedx = speedx;
-    this->speedy = speedy;
+    this->speed = speed;
 }
 
-void Platform::setRange(float rangex, float rangey)
+void Platform::setNextPoint(int next)
 {
-    this->rangex = rangex;
-    this->rangey = rangey;
+    this->next_point = next;
 }
 
-void Platform::setPauseTime(float pause)
+void Platform::setToGo(std::vector<sf::Vector2f> to_set)
 {
-    this->pause = pause;
-    this->relTime = pause;
+    to_go = to_set;
+}
+
+sf::Vector2f normalize(sf::Vector2f to_norm)
+{
+    float magnitude = sqrt(to_norm.x * to_norm.x + to_norm.y * to_norm.y);
+    return to_norm / magnitude;
 }
 
 void Platform::logic()
 {
-    if (speedx != 0 || speedy != 0)
+    if (speed != 0 && to_go.size() != 0)
     {
-        if (relTime < pause) {
-            relTime++;
-        } else {
-            if ((relxPos >= rangex && speedx > 0) || (relxPos < 0 && speedx < 0))
-            {
-                speedx *= -1;
-                relTime = 0;
-            }
-            if ((relyPos >= rangey && speedy > 0) || (relyPos < 0 && speedy < 0))
-            {
-                speedy *= -1;
-                relTime = 0;
-            }
-            TimeManager *timeManager = TimeManager::get();
-            Timeline *localTime = timeManager->getTimelines().at(1);
-            float delta_time = localTime->deltaTime();
-            move(speedx * delta_time, speedy * delta_time);
-            //I think this kind of check is ok to not be immediately reliant, could be cringe
-            ObjectManager *objectManager = ObjectManager::get();
-            std::vector<Object*> objectsAbove = objectManager->touchingPhysicsAbove(this);
-            for (auto & object : objectsAbove) {
-                object->move(speedx * delta_time, speedy * delta_time);
-            }
+        // move towards next point
+        sf::Vector2f direction = normalize(to_go.at(next_point) - getPosition());
+        body->velocity = direction * speed;
 
-            relxPos += speedx * delta_time;
-            relyPos += speedy * delta_time;
+        TimeManager *timeManager = TimeManager::get();
+        Timeline *localTime = timeManager->getTimelines().at(1);
+        float delta_time = localTime->deltaTime();
+
+        move(body->velocity.x * delta_time, body->velocity.y * delta_time);
+        if (normalize(to_go.at(next_point) - getPosition()) != direction) {
+            next_point++;
+            if (next_point >= to_go.size())
+                next_point = 0;
+        }
+        //I think this kind of check is ok to not be immediately reliant, could be cringe
+        ObjectManager *objectManager = ObjectManager::get();
+        std::vector<Object*> objectsAbove = objectManager->touchingPhysicsAbove(this);
+        for (auto & object : objectsAbove) {
+            object->move(body->velocity.x * delta_time, body->velocity.y * delta_time);
         }
     }
     sf::Shape::update();
@@ -108,8 +104,14 @@ json Platform::toClientJSON()
     // Might have to get direction of velocity in this to send to client
     // server will handle direction changes, client will merely just move it in the chosen direction until told otherwise
     output["Size"] = {m_size.x, m_size.y};
-    output["SpeedX"] = speedx;
-    output["SpeedY"] = speedy;
+    output["Speed"] = speed;
+    output["NextPoint"] = next_point;
+    output["PointAmount"] = to_go.size();
+    int idx = 0;
+    for (auto & point : to_go) {
+        output[std::string("Point") + std::to_string(idx)] = {point.x, point.y};
+        idx++;
+    }
 
     return output;
     

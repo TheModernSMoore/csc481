@@ -67,13 +67,20 @@ bool ObjectManager::parseObjJSON(nlohmann::json to_parse)
 // ELSE CREATE OBJ WITH IDENTIFIER IN OBJECTS
     auto iterator_thing = objects.find(to_parse["Identifier"]);
     Object *parsed = nullptr;
+    std::string type = to_parse["Type"];
     if (objects.find(to_parse["Identifier"]) == objects.end()) {
-        std::string type = to_parse["Type"];
         if (type.compare("Platform") == 0) {
             // Construct Platform
             sf::Vector2f size(to_parse["Size"][0], to_parse["Size"][1]);
             Platform *platform = new Platform(size);
             platform->identifier = to_parse["Identifier"];
+            platform->setSpeed(to_parse["Speed"]);
+            std::vector<sf::Vector2f> to_set;
+            for (int i = 0; i < to_parse["PointAmount"]; i++) {
+                to_set.push_back(sf::Vector2f(to_parse[std::string("Point") + std::to_string(i)][0], to_parse[std::string("Point") + std::to_string(i)][1]));
+            }
+            platform->setToGo(to_set);
+
             sf::Color color(to_parse["Color"][0], to_parse["Color"][1], to_parse["Color"][2]);
             platform->setFillColor(color);
             sf::Texture *texture = new sf::Texture;
@@ -104,6 +111,9 @@ bool ObjectManager::parseObjJSON(nlohmann::json to_parse)
         }
     } else {
         parsed = iterator_thing->second;
+    }
+    if (type.compare("Platform") == 0) {
+        dynamic_cast<Platform*>(parsed)->setNextPoint(to_parse["NextPoint"]);
     }
     float x = to_parse["Position"][0];
     float y = to_parse["Position"][1];

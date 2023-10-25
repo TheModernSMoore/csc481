@@ -9,23 +9,13 @@ class Platform : public Object
 {
     private:
         // speed of platform in x direction
-        float speedx = 0;
-        // speed of platform in y direction
-        float speedy = 0;
-        // range of x motion
-        float rangex = std::numeric_limits<float>::max();
-        // range of y motion
-        float rangey = std::numeric_limits<float>::max();
-        // time that the platform will pause before going the other direction
-        float pause = 0;
-        // the relative time before the pause
-        float relTime = 0;
-        // the relative x position in relation to the rangex
-        float relxPos = 0;
-        // the relative y position in relation to the rangey
-        float relyPos = 0;
+        float speed = 0;
         // the size of the platform
         sf::Vector2f m_size;
+        //  a vector of position vectors for the platform to travel to
+        std::vector<sf::Vector2f> to_go;
+        // int with index of the next position vector to go to
+        int next_point = 0;
 
     public:
         // Constructor of platform (merely creates the rectangle shape based on size)
@@ -38,12 +28,12 @@ class Platform : public Object
         virtual std::size_t getPointCount() const;
         
         virtual sf::Vector2f getPoint(std::size_t index) const;
+        // sets speed of platform, and tells it what position vectors to go to
+        void setSpeed(float speed);
+        
+        void setNextPoint(int next);
 
-        void setSpeed(float speedx, float speedy);
-
-        void setRange(float rangex, float rangey);
-
-        void setPauseTime(float pause);
+        void setToGo(std::vector<sf::Vector2f> to_set);
 
         virtual void logic();
         // Makes json info to be used for sending to client

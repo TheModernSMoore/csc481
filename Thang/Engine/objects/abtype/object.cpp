@@ -78,12 +78,6 @@ void Object::setTexturePath(std::string texture_path) {
     tex_path = texture_path;
 }
 
-void Object::setBody(bool affected)
-{
-    body = new object_body;
-    body->physicsAffected = affected;
-}
-
 void Object::move(float offsetX, float offsetY) {
     if (!body) {
         Shape::move(offsetX, offsetY);
@@ -94,6 +88,14 @@ void Object::move(float offsetX, float offsetY) {
             movePhysUnaffected(offsetX, offsetY, this, &movetex);
         }
     }
+}
+
+void Object::setBody(bool affected)
+{
+    body = new object_body;
+    body->physicsAffected = affected;
+    body->velocity.x = 0;
+    body->velocity.y = 0;
 }
 
 void Object::setCollisionArea()
