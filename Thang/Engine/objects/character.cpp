@@ -58,13 +58,13 @@ void Character::logic()
     std::vector<Object*> objectsBelow = objectManager->touchingBelow(this);
     std::vector<Object*> objectsAbove = objectManager->touchingAbove(this);
     if (objectsAbove.size() > 0) {
-        vertical_speed = -DOWN_ACCEL * delta_time;
+        body->velocity.y = -DOWN_ACCEL * delta_time;
     } else if (objectsBelow.size() > 0) {
-        vertical_speed = -DOWN_ACCEL * delta_time;
-    } else if (vertical_speed > TERM_VEL) {
-        vertical_speed -= DOWN_ACCEL * delta_time;
+        body->velocity.y = -DOWN_ACCEL * delta_time;
+    } else if (body->velocity.y > TERM_VEL) {
+        body->velocity.y -= DOWN_ACCEL * delta_time;
     }
-    move(0, TERM_VEL <= vertical_speed ? -vertical_speed * delta_time : -TERM_VEL * delta_time);
+    move(0, TERM_VEL <= body->velocity.y ? -body->velocity.y * delta_time : -TERM_VEL * delta_time);
 }
 
 // This handles all input and corresponding movement
@@ -74,22 +74,22 @@ void Character::input(std::string direction)
     Timeline *localTime = timeManager->getTimelines().at(1);
     float delta_time = localTime->deltaTime();
     if (direction.find("l") != std::string::npos) {
-        if (curr_speed > 0) {
-            curr_speed = 0;
+        if (body->velocity.x > 0) {
+            body->velocity.x = 0;
         }
-        move(curr_speed <= speed * -1 ? curr_speed * delta_time : (curr_speed -= accel * delta_time) * delta_time, 0);
+        move(body->velocity.x <= speed * -1 ? body->velocity.x * delta_time : (body->velocity.x -= accel * delta_time) * delta_time, 0);
     } else if (direction.find("r") != std::string::npos) {
-        if (curr_speed < 0) {
-            curr_speed = 0;
+        if (body->velocity.x < 0) {
+            body->velocity.x = 0;
         }
-        move(curr_speed >= speed ? curr_speed * delta_time : (curr_speed += accel * delta_time) * delta_time, 0);
+        move(body->velocity.x >= speed ? body->velocity.x * delta_time : (body->velocity.x += accel * delta_time) * delta_time, 0);
     }
     ObjectManager *objectManager = ObjectManager::get();
     std::vector<Object*> objectsBelow = objectManager->touchingBelow(this);
     // SHOULD PROBABLY JUST HAVE A ON GROUND FUNCTION
     if (objectsBelow.size() > 0 && direction.find("u") != std::string::npos) {
-        vertical_speed = jump_speed * delta_time;
-        move(0, -vertical_speed);
+        body->velocity.y = jump_speed * delta_time;
+        move(0, -body->velocity.y);
     }
 }
 
