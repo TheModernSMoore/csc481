@@ -1,13 +1,14 @@
 #include "character.h"
 #include <iostream>
 
+
 using json = nlohmann::json;
 
 Character::Character(size_t radius ,float speed, float accel, float jump_speed)
 {
     Object::setBody(true); // physics affected body
     Object::setVisible(); // allows to be drawn
-    radius = radius;
+    this->radius = radius;
     this->speed = speed;
     this->accel = accel;
     this->jump_speed = jump_speed;
@@ -17,7 +18,7 @@ Character::Character(size_t radius ,float speed, float accel, float jump_speed)
 
 void Character::setSize(size_t radius)
 {
-    radius = radius;
+    this->radius = radius;
     sf::Shape::update();
 }
         

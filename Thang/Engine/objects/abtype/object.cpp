@@ -89,7 +89,7 @@ void Object::move(float offsetX, float offsetY) {
         Shape::move(offsetX, offsetY);
     } else {
         if (body->physicsAffected) {
-            // movePhysAffected(offsetX, offsetY, this, &movetex);
+            movePhysAffected(offsetX, offsetY, this, &movetex);
         } else {
             movePhysUnaffected(offsetX, offsetY, this, &movetex);
         }
@@ -117,7 +117,6 @@ void Object::logic() {}
 bool Object::isOverlapped(Object *other)
 {
     sf::Rect<float> shape1 = this->getGlobalBounds();
-    std::cout << shape1.left << " " << shape1.left + shape1.width << " " << shape1.top << " " << shape1.top + shape1.height << std::endl;
     sf::Rect<float> shape2 = other->getGlobalBounds();
     return shape1.intersects(shape2);
 }

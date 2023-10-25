@@ -98,9 +98,8 @@ void Object::move(float offsetX, float offsetY) {
 
 void Object::setCollisionArea()
 {
-    object_collision_area area_toset;
     // parts of struct to set
-    collision_area = &area_toset;
+    collision_area = new object_collision_area;
 }
 
 void Object::setVisible()

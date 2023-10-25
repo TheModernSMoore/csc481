@@ -231,7 +231,7 @@ std::vector<Object*> ObjectManager::overlappedPhysics(Object *object)
     std::vector<Object*> touchers;
     for (auto & [key, other] : bodies)
     {
-        if (other != object && object->body->physicsAffected && object->isOverlapped(other)) {
+        if (other != object && other->body->physicsAffected && object->isOverlapped(other)) {
             touchers.push_back(other);
         }
     }
@@ -245,7 +245,7 @@ std::vector<Object*> ObjectManager::touchingPhysics(Object *object)
     std::vector<Object*> touchers;
     for (auto & [key, other] : bodies)
     {
-        if (other != object && object->body->physicsAffected && object->isTouching(other)) {
+        if (other != object && other->body->physicsAffected && object->isTouching(other)) {
             touchers.push_back(other);
         }
     }
@@ -257,7 +257,7 @@ std::vector<Object*> ObjectManager::touchingPhysicsBelow(Object *object)
     std::vector<Object*> touchers;
     for (auto & [key, other] : bodies)
     {
-        if (other != object && object->body->physicsAffected && object->isTouchingBelow(other)) {
+        if (other != object && other->body->physicsAffected && object->isTouchingBelow(other)) {
             touchers.push_back(other);
         }
     }
@@ -269,7 +269,7 @@ std::vector<Object*> ObjectManager::touchingPhysicsRight(Object *object)
     std::vector<Object*> touchers;
     for (auto & [key, other] : bodies)
     {
-        if (other != object && object->body->physicsAffected && object->isTouchingRight(other)) {
+        if (other != object && other->body->physicsAffected && object->isTouchingRight(other)) {
             touchers.push_back(other);
         }
     }
@@ -281,7 +281,7 @@ std::vector<Object*> ObjectManager::touchingPhysicsLeft(Object *object)
     std::vector<Object*> touchers;
     for (auto & [key, other] : bodies)
     {
-        if (other != object && object->body->physicsAffected && object->isTouchingLeft(other)) {
+        if (other != object && other->body->physicsAffected && object->isTouchingLeft(other)) {
             touchers.push_back(other);
         }
     }
@@ -293,7 +293,7 @@ std::vector<Object*> ObjectManager::touchingPhysicsAbove(Object *object)
     std::vector<Object*> touchers;
     for (auto & [key, other] : bodies)
     {
-        if (other != object && object->body->physicsAffected && object->isTouchingAbove(other)) {
+        if (other != object && other->body->physicsAffected && object->isTouchingAbove(other)) {
             touchers.push_back(other);
         }
     }
@@ -306,7 +306,6 @@ std::vector<Object*> ObjectManager::overlappedBodies(Object *object)
     for (auto & [key, other] : bodies)
     {
         if (other != object && object->isOverlapped(other)) {
-            std::cout << "dkal" << std::endl;
             touchers.push_back(other);
         }
     }

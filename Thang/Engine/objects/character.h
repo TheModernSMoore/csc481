@@ -23,10 +23,10 @@ class Character : public Object
         float vertical_speed = 0;
         // the radius of the character (circle)
         float radius;
-
-    public:
         // the number of points the character has (for constructing the circle)
         int points = 30;
+
+    public:
 
         
         // constructor for the character given radius, speed, acceleration, jump speed, and downwards acceleration

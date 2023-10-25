@@ -108,6 +108,7 @@ int main(int argc, char const *argv[])
             objectManager->parseObjJSON(to_parse);
             more = obj_msg.more();
         }
+        std::cout << objectManager->getVisibles().size() << std::endl;
         for (auto & [ident, object] : objectManager->getVisibles()) {
             window.draw(*object);
         }
