@@ -17,7 +17,7 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
 {
     Character *man = new Character(20, 5, 0.5, 10);
     man->setPosition(400.f, 150.f);
-
+    int character_ident = -1;
     ObjectManager *objectManager = ObjectManager::get();
     {
         std::unique_lock<std::mutex> initLock(*m);
@@ -26,6 +26,8 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
         characters->push_back(man);
         inputs->push_back(std::string("")); // this will be at clients_connected - 1
     }
+    character_ident = man->identifier;
+
 
     TimeManager *timeManager = TimeManager::get();
     Timeline *globalTime = timeManager->getTimelines().at(0);
@@ -34,6 +36,13 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
     std::string endpoint("tcp://*:" + std::to_string(5555 + client_number)); // find next available local host connection
     comsock.bind(endpoint.c_str());
     std::cout << "binding to " << endpoint << std::endl;
+
+    zmq::message_t idc_msg;
+    auto res = comsock.recv(idc_msg);
+    comsock.send(zmq::buffer(std::to_string(character_ident)));
+    
+
+
     float time_since_recv = 0;
     while (1) {
         zmq::message_t input_message;
@@ -127,12 +136,19 @@ int main(int argc, char const *argv[])
 
     objectManager->addObject(&borb);
 
-    Platform ground(sf::Vector2f(1200.f, 25.f));
+    Platform ground(sf::Vector2f(600.f, 25.f));
     ground.setPosition(0, 600 - 25);
     ground.setTexturePath("img/grass.jpg");
     
 
     objectManager->addObject(&ground);
+
+    Platform ground_again(sf::Vector2f(550.f, 25.f));
+    ground_again.setPosition(650, 600 - 25);
+    ground_again.setTexturePath("img/grass.jpg");
+    
+
+    objectManager->addObject(&ground_again);
 
 
     Platform wall(sf::Vector2f(25.f, 600-25));
@@ -142,12 +158,12 @@ int main(int argc, char const *argv[])
     objectManager->addObject(&wall);
 
     SpawnPoint spawner;
-    spawner.setPosition(200, 300);
+    spawner.setPosition(200, 550);
 
     objectManager->addObject(&spawner);
 
-    DeathBox pit(sf::Vector2f(25.f, 25.f));
-    pit.setPosition(400, 600 - 50);
+    DeathBox pit(sf::Vector2f(1800.f, 50.f));
+    pit.setPosition(0, 650);
 
     objectManager->addObject(&pit);
 

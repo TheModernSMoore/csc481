@@ -30,8 +30,15 @@ std::string getInput()
 int main(int argc, char const *argv[])
 {
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Window", sf::Style::Resize);
+    sf::View view(sf::Vector2f(400, 300), sf::Vector2f(800, 600));
     // change the position of the window (relatively to the desktop)
     window.setPosition(sf::Vector2i(50, 50));
+
+    // TimeManager *timeManager = TimeManager::get();
+    // Timeline realTime = Timeline();
+    // Timeline localTime = Timeline(&realTime, 100000000);
+    // timeManager->addTimeline(&realTime);
+    // timeManager->addTimeline(&localTime);
 
     ObjectManager *objectManager = ObjectManager::get();
     
@@ -56,8 +63,29 @@ int main(int argc, char const *argv[])
     mainket.connect(endpoint.c_str());
     std::cout << "connecting to " << endpoint << std::endl;
 
+    mainket.send(zmq::buffer("gimmie my character id please"));
+
+    zmq::message_t char_ident_msg;
+    res = mainket.recv(char_ident_msg);
+    int character_ident = -1;
+
+    if(sscanf(char_ident_msg.to_string().c_str(), "%d", &character_ident) <= 0) {
+        std::cout << reply.to_string() << std::endl;
+        std::cout << "cringe " << character_ident << std::endl;
+    };
+
     bool in_focus = true;
     bool paused = false;
+
+    Character *my_character = nullptr;
+
+    // // do not ask why this is necessary, IF I WERE TO CREATE 1 MORE OBJECT, THEY WOULD NOT APPEAR
+    // // AND THIS FIXED IT
+    // for (int i = 0; i < W; i++)  
+    // {
+    //     realTime.setTime();
+    //     localTime.setTime();
+    // }
 
     // run the program as long as the window is open
     while (window.isOpen())
@@ -121,13 +149,19 @@ int main(int argc, char const *argv[])
             } else {
                 objects_not_recv.push_back(object);
             }
+            if (!my_character && ident == character_ident) {
+                my_character = dynamic_cast<Character *>(object);
+            }
         }
         for (auto & object : objects_not_recv) {
             objectManager->removeObject(object);
         }
-        
+
+        // HANDLE VIEW STUFF HERE
+        view.move((my_character->getPosition().x - view.getCenter().x) / 50, 0);
+        window.setView(view);   
+    
         window.display();
     }
-    //                                 HANDLE DISCONNECTING HERE!!!!
     return 0;
 }
