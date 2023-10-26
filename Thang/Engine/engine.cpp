@@ -55,7 +55,7 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
             time_since_recv = 0;
         } else {
             time_since_recv += (globalTime->deltaTime()) / 0.000001;
-            if (time_since_recv >= 10000000000000000) { // Ima be fr, idk why this number but it work
+            if (time_since_recv >= 100000000000000) { // Ima be fr, idk why this number but it work
                 break;
             }
         }
@@ -89,9 +89,9 @@ void clientCreation(int *clients_connected, std::vector<std::string> *inputs, st
 
 int main(int argc, char const *argv[])
 {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Window", sf::Style::Resize);
-    // change the position of the window (relatively to the desktop)
-    window.setPosition(sf::Vector2i(50, 50));
+    // sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Window", sf::Style::Resize);
+    // // change the position of the window (relatively to the desktop)
+    // window.setPosition(sf::Vector2i(50, 50));
 
 
     TimeManager *timeManager = TimeManager::get();
@@ -118,6 +118,8 @@ int main(int argc, char const *argv[])
     borb.setPosition(375.f, 450.f);
     std::vector<sf::Vector2f> borb_set;
     borb_set.push_back(sf::Vector2f(575.f, 450.f));
+    borb_set.push_back(sf::Vector2f(575.f, 350.f));
+    borb_set.push_back(sf::Vector2f(375.f, 350.f));
     borb_set.push_back(sf::Vector2f(375.f, 450.f));
     borb.setToGo(borb_set);
     borb.setSpeed(2);
@@ -125,7 +127,7 @@ int main(int argc, char const *argv[])
 
     objectManager->addObject(&borb);
 
-    Platform ground(sf::Vector2f(800.f, 25.f));
+    Platform ground(sf::Vector2f(1200.f, 25.f));
     ground.setPosition(0, 600 - 25);
     ground.setTexturePath("img/grass.jpg");
     
@@ -138,12 +140,6 @@ int main(int argc, char const *argv[])
     wall.setFillColor(sf::Color::Red);
 
     objectManager->addObject(&wall);
-
-    Platform wall2(sf::Vector2f(25.f, 600-25));
-    wall2.setPosition(700, 0);
-    wall2.setFillColor(sf::Color::Yellow);
-    
-    objectManager->addObject(&wall2);
 
     SpawnPoint spawner;
     spawner.setPosition(200, 300);
@@ -204,12 +200,12 @@ int main(int argc, char const *argv[])
             if(!(localTime.isPaused()))
                 objectManager->updateObjects();
 
-            window.clear(sf::Color::Black);
+            // window.clear(sf::Color::Black);
 
-            for (auto & [key, value] : objectManager->getVisibles()) {
-                window.draw(*value);
-            }
-            window.display();
+            // for (auto & [key, value] : objectManager->getVisibles()) {
+            //     window.draw(*value);
+            // }
+            // window.display();
         }
     }
     return 0;

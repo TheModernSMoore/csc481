@@ -6,11 +6,13 @@
 using json = nlohmann::json;
 
 std::mutex Object::movetex;
+std::mutex Object::createtex;
 
 int Object::objects_made = 0;
 
 Object::Object()
 {
+    std::unique_lock<std::mutex> lock(createtex);
     identifier = objects_made++;
 }
 

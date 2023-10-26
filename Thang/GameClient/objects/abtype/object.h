@@ -18,6 +18,8 @@ class Object : public sf::Shape
     private:
         // Keeps track of how many drawable objects have been made (those sent to client) in order to make unique identifier
         static int objects_made;
+        // mutex for objects_made increment and storing as identifiers
+        static std::mutex createtex;
 
     protected:
         // the mutex used for safe movement in all objects, hence protected and static

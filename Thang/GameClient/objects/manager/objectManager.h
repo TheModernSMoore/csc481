@@ -44,7 +44,7 @@ class ObjectManager
         void updateObjects();
         // will parse json and if an object with the given identifier doesn't exist, it will make it
         // then updates position of matching object and returns it
-        bool parseObjJSON(nlohmann::json to_parse);
+        int parseObjJSON(nlohmann::json to_parse);
         // returns the vector of Object pointers
         std::map<int, Object*> getObjects();
         // returns the map of visible Object pointers sorted by the identifier assigned

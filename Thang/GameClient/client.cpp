@@ -97,6 +97,8 @@ int main(int argc, char const *argv[])
         // clear the window with black color
         window.clear(sf::Color::Black);
         
+        std::vector<int> identifiers_recv;
+        std::vector<Object *> objects_not_recv;
 
         // Get json, and check if they have more messages to keep reading more input
         bool more = true;
@@ -104,12 +106,24 @@ int main(int argc, char const *argv[])
             zmq::message_t obj_msg;
             auto res = mainket.recv(obj_msg);
             json to_parse = json::parse(obj_msg.to_string());
-            objectManager->parseObjJSON(to_parse);
+            identifiers_recv.push_back(objectManager->parseObjJSON(to_parse));
             more = obj_msg.more();
         }
         // DELETE OBJECTS THAT WERE NOT SENT!!!!!
-        for (auto & [ident, object] : objectManager->getVisibles()) {
-            window.draw(*object);
+        std::vector<int>::iterator it;
+        it = identifiers_recv.begin();
+        for (auto & [ident, object] : objectManager->getObjects()) {
+            if (ident == *it) {
+                it++;
+                if (object->visible) {
+                window.draw(*object);
+            }
+            } else {
+                objects_not_recv.push_back(object);
+            }
+        }
+        for (auto & object : objects_not_recv) {
+            objectManager->removeObject(object);
         }
         
         window.display();

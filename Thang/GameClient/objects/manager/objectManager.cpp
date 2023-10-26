@@ -62,7 +62,7 @@ std::map<int, Object*> ObjectManager::getBodies()
     return bodies;
 }
 
-bool ObjectManager::parseObjJSON(nlohmann::json to_parse)
+int ObjectManager::parseObjJSON(nlohmann::json to_parse)
 {  // READ JSON, IF IDENTIFIER EXISTS IN OBJ LIST, JUST UPDATE POSITION (or any other necessary componets)
 // ELSE CREATE OBJ WITH IDENTIFIER IN OBJECTS
     auto iterator_thing = objects.find(to_parse["Identifier"]);
@@ -120,7 +120,7 @@ bool ObjectManager::parseObjJSON(nlohmann::json to_parse)
             parsed = spawnPoint;
             addObject(parsed);
         } else {
-            return false;
+            return -1;
         }
     } else {
         parsed = iterator_thing->second;
@@ -131,7 +131,7 @@ bool ObjectManager::parseObjJSON(nlohmann::json to_parse)
     float x = to_parse["Position"][0];
     float y = to_parse["Position"][1];
     parsed->setPosition(x, y);
-    return true;
+    return parsed->identifier;
     
 }
 
