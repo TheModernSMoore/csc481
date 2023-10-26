@@ -38,13 +38,13 @@ void ObjectManager::addObject(Object *object)
 
 void ObjectManager::removeObject(Object *object)
 {
-    // objects.erase(std::remove(objects.begin(), objects.end(), object), objects.end());
-    // if (object->body) {
-    //     bodies.erase(std::remove(bodies.begin(), bodies.end(), object), bodies.end());
-    // } 
-    // // else if (object->visible) {
-    // //     visibles.erase(std::remove(visibles.begin(), visibles.end(), object), visibles.end());
-    // // }
+    objects.erase(object->identifier);
+    if (object->body) {
+        bodies.erase(object->identifier);
+    } 
+    if (object->visible) {
+        visibles.erase(object->identifier);
+    }
 }
 
 std::map<int, Object*> ObjectManager::getObjects()
@@ -105,6 +105,19 @@ bool ObjectManager::parseObjJSON(nlohmann::json to_parse)
             }
 
             parsed = character;
+            addObject(parsed);
+        } else if (type.compare("DeathBox") == 0) {
+            // Construct DeathBox
+            sf::Vector2f size(to_parse["Size"][0], to_parse["Size"][1]);
+            DeathBox *deathBox = new DeathBox(size);
+
+            parsed = deathBox;
+            addObject(parsed);
+        } else if (type.compare("SpawnPoint") == 0) {
+            // Construct SpawnPoint
+            SpawnPoint *spawnPoint = new SpawnPoint();
+
+            parsed = spawnPoint;
             addObject(parsed);
         } else {
             return false;

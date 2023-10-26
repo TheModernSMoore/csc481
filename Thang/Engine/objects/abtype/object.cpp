@@ -11,10 +11,12 @@ int Object::objects_made = 0;
 
 Object::Object()
 {
-    object_body *body = NULL;
-    object_visible *visible = NULL;
-    object_collision_area *collision_area = NULL;
     identifier = objects_made++;
+}
+
+std::string Object::getObjectType()
+{
+    return object_type;
 }
 
 void movePhysAffected(float offsetX, float offsetY, Object *to_move, std::mutex *movetex)

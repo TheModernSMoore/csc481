@@ -21,6 +21,7 @@ Timeline::Timeline()
     anchor = nullptr;
     current_time = start_time;
     last_time = start_time;
+    delta_time = 0;
     clock.restart();
 }
 
@@ -41,6 +42,7 @@ void Timeline::setTime()
         }
     } else {
         current_time = clock.getElapsedTime().asMicroseconds();
+        delta_time = current_time - last_time;
     }
 }
 

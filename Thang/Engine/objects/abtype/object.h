@@ -6,6 +6,7 @@
 #include "../common.h"
 #include <nlohmann/json.hpp>
 #include <cmath>
+#include <iostream>
 
 #define DOWN_ACCEL 0.3
 #define TERM_VEL -6
@@ -38,11 +39,11 @@ class Object : public sf::Shape
     public:
         int identifier;
 
-        object_body *body;
+        object_body *body = nullptr;
 
-        object_visible *visible;
+        object_visible *visible = nullptr;
 
-        object_collision_area *collision_area;
+        object_collision_area *collision_area = nullptr;
 
 
         //Constructor and destructor below
@@ -70,4 +71,6 @@ class Object : public sf::Shape
         virtual void move(float offsetX, float offsetY);
         // 
         void setTexturePath(std::string texture_path);
+        // returns object type string
+        std::string getObjectType();
 };

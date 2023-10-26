@@ -6,6 +6,8 @@
 #include "../abtype/object.h"
 #include "../character.h"
 #include "../platform.h"
+#include "../spawnPoint.h"
+#include "../deathBox.h"
 #include "../../timeline/timeManager.h"
 #include "../common.h"
 

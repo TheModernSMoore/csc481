@@ -3,8 +3,7 @@
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
 #include <iostream>
-#include "objects/platform.h"
-#include "objects/character.h"
+#include "objects/manager/objectManager.h"
 #include "timeline/timeManager.h"
 
 using json = nlohmann::json;
@@ -108,6 +107,7 @@ int main(int argc, char const *argv[])
             objectManager->parseObjJSON(to_parse);
             more = obj_msg.more();
         }
+        // DELETE OBJECTS THAT WERE NOT SENT!!!!!
         for (auto & [ident, object] : objectManager->getVisibles()) {
             window.draw(*object);
         }

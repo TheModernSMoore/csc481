@@ -1,6 +1,5 @@
 #include <SFML/Window.hpp>
-#include "objects/platform.h"
-#include "objects/character.h"
+#include "objects/manager/objectManager.h"
 #include "timeline/timeManager.h"
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
@@ -16,27 +15,30 @@ inline bool instanceof(const T *ptr) {
 
 void clientMessaging(int client_number, std::vector<std::string> *inputs, std::mutex *m, std::vector<Character*> *characters)
 {
+    Character *man = new Character(20, 5, 0.5, 10);
+    man->setPosition(400.f, 150.f);
+
     ObjectManager *objectManager = ObjectManager::get();
     {
         std::unique_lock<std::mutex> initLock(*m);
-        Character *man = new Character(20, 5, 0.5, 10);
-        man->setPosition(400.f, 150.f);
-
 
         objectManager->addObject(man);
         characters->push_back(man);
         inputs->push_back(std::string("")); // this will be at clients_connected - 1
     }
 
+    TimeManager *timeManager = TimeManager::get();
+    Timeline *globalTime = timeManager->getTimelines().at(0);
     zmq::context_t comtext(1);
     zmq::socket_t comsock(comtext, zmq::socket_type::rep);
     std::string endpoint("tcp://*:" + std::to_string(5555 + client_number)); // find next available local host connection
     comsock.bind(endpoint.c_str());
     std::cout << "binding to " << endpoint << std::endl;
+    float time_since_recv = 0;
     while (1) {
         zmq::message_t input_message;
-        auto res = comsock.recv(input_message);
-        {
+        auto res = comsock.recv(input_message, zmq::recv_flags::dontwait);
+        if (res) {
             // Might be able to put all this in a seperate PUB/SUB socket just so each client isn't asking for this each time
             std::unique_lock<std::mutex> lock(*m);
             inputs->at(client_number - 1) = input_message.to_string();
@@ -50,7 +52,18 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
                 std::string to_send = to_string(client_json);
                 comsock.send(zmq::buffer(to_send), current < size ? zmq::send_flags::sndmore : zmq::send_flags::none);
             }
+            time_since_recv = 0;
+        } else {
+            time_since_recv += (globalTime->deltaTime()) / 0.000001;
+            if (time_since_recv >= 10000000000000000) { // Ima be fr, idk why this number but it work
+                break;
+            }
         }
+    }
+    {
+        std::unique_lock<std::mutex> lock(*m);
+        objectManager->removeObject(man);
+        inputs->at(client_number - 1) = std::string("");
     }
 }
 
@@ -97,7 +110,7 @@ int main(int argc, char const *argv[])
     morb_set.push_back(sf::Vector2f(215.f, 250.f));
     morb.setToGo(morb_set);
     morb.setSpeed(2);
-    morb.setFillColor(sf::Color(166, 126, 18));
+    morb.setFillColor(sf::Color::Blue);
 
     objectManager->addObject(&morb);
 
@@ -122,13 +135,25 @@ int main(int argc, char const *argv[])
 
     Platform wall(sf::Vector2f(25.f, 600-25));
     wall.setPosition(100, 0);
+    wall.setFillColor(sf::Color::Red);
 
     objectManager->addObject(&wall);
 
     Platform wall2(sf::Vector2f(25.f, 600-25));
     wall2.setPosition(700, 0);
+    wall2.setFillColor(sf::Color::Yellow);
     
     objectManager->addObject(&wall2);
+
+    SpawnPoint spawner;
+    spawner.setPosition(200, 300);
+
+    objectManager->addObject(&spawner);
+
+    DeathBox pit(sf::Vector2f(25.f, 25.f));
+    pit.setPosition(400, 600 - 50);
+
+    objectManager->addObject(&pit);
 
     std::vector<Character*> characters;
 
