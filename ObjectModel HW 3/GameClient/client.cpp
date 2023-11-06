@@ -18,8 +18,7 @@ std::string getInput()
     std::string output;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
         output += std::string("l");
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
         output += std::string("r");
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
