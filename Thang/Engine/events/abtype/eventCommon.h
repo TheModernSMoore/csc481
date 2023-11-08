@@ -5,4 +5,4 @@ enum EventType {
     CHARACTER_COLLISION,
     CHARACTER_DEATH,
     CHARACTER_SPAWN
-}
+};

@@ -2,7 +2,9 @@
 
 using json = nlohmann::json;
 
-Event::Event() {}
+Event::Event() {
+    this->time_stamp = TimeManager::get()->getTimelines().at(0)->getCurrentTime();
+}
 
 Event::~Event() {}
 

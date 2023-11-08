@@ -9,4 +9,4 @@ class CharCollideHandler : public EventHandler
         CharCollideHandler();
         // Function that actually handles the event
         virtual void onEvent(Event e) = 0;
-}
+};

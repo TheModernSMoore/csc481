@@ -16,4 +16,4 @@ class UserInput : public Event
         UserInput(Character *character_controlled);
         // To json function
         virtual nlohmann::json toClientJSON();
-}
+};

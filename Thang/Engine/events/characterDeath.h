@@ -17,4 +17,4 @@ class CharacterDeath : public Event
         CharacterDeath(Character *character_to_die);
         // Makes json info to be used for sending to client
         virtual nlohmann::json toClientJSON();
-}
+};

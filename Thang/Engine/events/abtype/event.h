@@ -1,6 +1,7 @@
 #pragma once
 #include "eventCommon.h"
 #include <nlohmann/json.hpp>
+#include "../../timeline/timeManager.h"
 
 class Event
 {
@@ -9,11 +10,7 @@ class Event
         EventType type;
         // The way to help build json
         nlohmann::json clientJSONHelper();
-        // age of the event (incremented every frame? or whenever other event handled?)
-        int64_t age;
-        // is it real-time?  higher priority if so
-        bool real_time;
-        // timestamp of event creation
+        // Time until the event wants to be handled
         int64_t time_stamp;
     
     public:
@@ -25,4 +22,4 @@ class Event
 
         EventType getType();
 
-}
+};

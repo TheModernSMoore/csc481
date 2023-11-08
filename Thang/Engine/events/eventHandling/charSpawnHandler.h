@@ -9,4 +9,4 @@ class CharSpawnHandler : public EventHandler
         CharSpawnHandler();
         // Function that actually handles the event
         virtual void onEvent(Event e) = 0;
-}
+};

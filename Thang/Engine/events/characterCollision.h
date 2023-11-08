@@ -18,4 +18,4 @@ class CharacterCollision : public Event
 
         // To json function
         virtual nlohmann::json toClientJSON();
-}
+};

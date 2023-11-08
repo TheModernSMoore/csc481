@@ -9,4 +9,4 @@ class CharDeathHandler : public EventHandler
         CharDeathHandler();
         // Function that actually handles the event
         virtual void onEvent(Event e) = 0;
-}
+};

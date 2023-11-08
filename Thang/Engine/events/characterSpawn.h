@@ -17,4 +17,4 @@ class CharacterSpawn : public Event
         CharacterSpawn(Character *character_to_spawn, SpawnPoint *place_to_spawn);
         // Makes json info to be used for sending to client
         virtual nlohmann::json toClientJSON();
-}
+};
