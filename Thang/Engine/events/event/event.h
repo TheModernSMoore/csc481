@@ -1,0 +1,92 @@
+#pragma once
+#include "eventCommon.h"
+#include <nlohmann/json.hpp>
+#include "../../objects/character.h"
+#include "../../objects/spawnPoint.h"
+#include "../../timeline/timeManager.h"
+#include "../../objects/manager/objectManager.h"
+
+class Event
+{
+    protected:
+        // The enumerable type of the event
+        EventType type;
+        // The way to help build json
+        nlohmann::json clientJSONHelper();
+        // Time until the event wants to be handled
+        int64_t time_stamp;
+    
+    public:
+        //Constructor and destructor below
+        Event();
+        virtual ~Event() = 0;
+        // Makes json info to be used for sending to client
+        virtual nlohmann::json toClientJSON() = 0;
+
+        EventType getType();
+
+};
+
+
+class CharacterCollision : public Event
+{
+    private:
+        // IMPORTANT TO CHECK THAT THIS STILL EXISTS SINCE ASYNCHRONOUSITY
+        Object *collided_with;
+        // Character who the collision will affect
+        Character *character;
+
+    public:
+        // Constructor
+        CharacterCollision(Character *character_collided, Object *collided_with_character);
+
+        // To json function
+        virtual nlohmann::json toClientJSON();
+};
+
+
+class CharacterDeath : public Event
+{
+    private:
+        // reference to the character being handled, check if still exists
+        Character *character;
+
+    public:
+        // Constructor
+        CharacterDeath(Character *character_to_die);
+        // Makes json info to be used for sending to client
+        virtual nlohmann::json toClientJSON();
+};
+
+
+class CharacterSpawn : public Event
+{
+    private:
+        // Spawn Point for the player to be spawned at
+        SpawnPoint *spawnPoint;
+        // reference to the character being handled, check if still exists
+        Character *character;
+
+    public:
+        // Constructor
+        CharacterSpawn(Character *character_to_spawn, SpawnPoint *place_to_spawn);
+        // Makes json info to be used for sending to client
+        virtual nlohmann::json toClientJSON();
+};
+
+
+// This will most likely be raised on client but handled on server (with current implementation)
+class UserInput : public Event
+{
+    private:
+        // Input string to parse and handle movement with
+        std::string input_string;
+        // Reference to character to have input affect
+        Character *character;
+
+    public:
+        // Constructor that could calculate user input and store it here
+        UserInput(Character *character_controlled);
+        // To json function
+        virtual nlohmann::json toClientJSON();
+};
