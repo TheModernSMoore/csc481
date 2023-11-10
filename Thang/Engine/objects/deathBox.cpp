@@ -46,17 +46,12 @@ void DeathBox::logic()
 {
     // Change to event on collision later
     ObjectManager *objectManager = ObjectManager::get();
-    Object *spawnPoint = nullptr;
     std::vector<Object*> tokill;
-    for (auto & [key, object] : objectManager->getObjects()) {
-        if (object->getObjectType().compare("SpawnPoint") == 0) {
-            spawnPoint = object;
-        }
-    }
     for (auto & object : objectManager->overlappedBodies(this)) {
         if (object->getObjectType().compare("Character") == 0) {
             // Change to death event later
-            object->setPosition(spawnPoint->getPosition());        }
+            EventManager::get()->raise(new CharacterCollision(object, this));
+        }
     }
 }
 

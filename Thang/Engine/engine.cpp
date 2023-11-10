@@ -5,6 +5,7 @@
 #include <zmq_addon.hpp>
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include "events/manager/eventManager.h"
 
 using json = nlohmann::json;
 
@@ -178,6 +179,14 @@ int main(int argc, char const *argv[])
 
     std::thread client_creator(clientCreation, &clients_connected, &inputs, &m, &characters);
 
+
+    EventManager *eventManager = EventManager::get();
+
+    eventManager->addEventToHandler(std::list<EventType> {CHARACTER_COLLISION}, new CharCollideHandler);
+    eventManager->addEventToHandler(std::list<EventType> {CHARACTER_DEATH}, new CharDeathHandler);
+    eventManager->addEventToHandler(std::list<EventType> {CHARACTER_SPAWN}, new CharSpawnHandler);
+
+
     // do not ask why this is necessary, IF I WERE TO CREATE 1 MORE OBJECT, THEY WOULD NOT APPEAR
     // AND THIS FIXED IT
     for (int i = 0; i < W; i++)  
@@ -213,8 +222,10 @@ int main(int argc, char const *argv[])
                     characters.at(idx++)->input(input);
                 }
             }
-            if(!(localTime.isPaused()))
+            if(!(localTime.isPaused())) {
                 objectManager->updateObjects();
+                eventManager->handleEvents();
+            }
 
             // window.clear(sf::Color::Black);
 

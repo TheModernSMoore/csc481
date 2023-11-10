@@ -1,10 +1,21 @@
 #pragma once
-#include "eventCommon.h"
 #include <nlohmann/json.hpp>
-#include "../../objects/character.h"
-#include "../../objects/spawnPoint.h"
+#include "../../objects/abtype/object.h"
 #include "../../timeline/timeManager.h"
 #include "../../objects/manager/objectManager.h"
+
+class Character;
+
+class SpawnPoint;
+
+class Object;
+
+enum EventType {
+    USER_INPUT,
+    CHARACTER_COLLISION,
+    CHARACTER_DEATH,
+    CHARACTER_SPAWN
+};
 
 class Event
 {
@@ -13,7 +24,7 @@ class Event
         EventType type;
         // The way to help build json
         nlohmann::json clientJSONHelper();
-        // Time until the event wants to be handled
+        // Time that the event wants to be handled in
         int64_t time_stamp;
     
     public:
@@ -24,6 +35,10 @@ class Event
         virtual nlohmann::json toClientJSON() = 0;
 
         EventType getType();
+
+        int64_t getStamp();
+
+        bool operator>(const Event& other) const;
 
 };
 
@@ -39,9 +54,12 @@ class CharacterCollision : public Event
     public:
         // Constructor
         CharacterCollision(Character *character_collided, Object *collided_with_character);
-
         // To json function
         virtual nlohmann::json toClientJSON();
+        // gets the object collided with the character
+        Object* getOther();
+        // gets the character
+        Character* getCharacter();
 };
 
 
@@ -56,6 +74,8 @@ class CharacterDeath : public Event
         CharacterDeath(Character *character_to_die);
         // Makes json info to be used for sending to client
         virtual nlohmann::json toClientJSON();
+        // gets the character
+        Character* getCharacter();
 };
 
 
@@ -72,6 +92,10 @@ class CharacterSpawn : public Event
         CharacterSpawn(Character *character_to_spawn, SpawnPoint *place_to_spawn);
         // Makes json info to be used for sending to client
         virtual nlohmann::json toClientJSON();
+        // gets the character
+        Character* getCharacter();
+        // gets the spawn point
+        SpawnPoint* getSpawn();
 };
 
 

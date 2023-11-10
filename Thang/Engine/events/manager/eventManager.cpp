@@ -6,7 +6,7 @@ EventManager* EventManager::inst = NULL;
 
 std::map<EventType, std::list<EventHandler *>> EventManager::handlers;
 
-std::vector<Event *> EventManager::raised_events;
+std::priority_queue<Event*, std::vector<Event*>, std::greater<Event*>>  EventManager::raised_events;
 
 EventManager::EventManager() {}
 
@@ -34,5 +34,16 @@ void EventManager::raise(Event *e) {
 }
 
 void EventManager::handleEvents() {
-    // ITERATE THROUGH RAISED EVENTS, AND DECREMENT TIME TIL IN EVENT (WHY TIMESTAMP??)
+    int64_t currTime = TimeManager::get()->getTimelines().at(0)->getCurrentTime();
+    while (!raised_events.empty()) {
+        Event *current = raised_events.pop();
+        // If the next event is supposed to happen in the future, don't handle it
+        if (current->getStamp() > currTime) {
+            raised_events.push(current);
+            break;
+        }
+        for (auto & handler : handlers.at(current->getType())) {
+            handler->onEvent(current);
+        }
+    }
 }

@@ -1,4 +1,6 @@
 #include "event.h"
+#include "../../objects/character.h"
+#include "../../objects/spawnPoint.h"
 
 using json = nlohmann::json;
 
@@ -10,8 +12,16 @@ Event::Event() {
 
 Event::~Event() {}
 
-Event::getType() {
+bool Event::operator>(const Event& other) const {
+    return this->time_stamp > other.time_stamp;
+}
+
+EventType Event::getType() {
     return type;
+}
+
+int64_t Event::getStamp() {
+    return time_stamp;
 }
 
 json Event::clientJSONHelper() {
@@ -34,6 +44,14 @@ json CharacterCollision::toClientJSON() {
     return output;
 }
 
+Object* CharacterCollision::getOther() {
+    return collided_with;
+}
+
+Character* CharacterCollision::getCharacter() {
+    return character;
+}
+
 // Character death implementation
 
 CharacterDeath::CharacterDeath(Character *character_to_die, ) {
@@ -48,6 +66,10 @@ json CharacterDeath::toClientJSON() {
     return output;
 }
 
+Character* CharacterDeath::getCharacter() {
+    return character;
+}
+
 // Character spawn implementation
 
 CharacterSpawn::CharacterSpawn(Character *character_to_spawn, SpawnPoint *place_to_spawn) {
@@ -60,6 +82,14 @@ json CharacterSpawn::toClientJSON() {
     output["CharacterID"] = character->identifier;
     output["SpawnPointID"] = spawnPoint->identifier;
     return output;
+}
+
+Character* CharacterSpawn::getCharacter() {
+    return character;
+}
+
+SpawnPoint* CharacterSpawn::getSpawn() {
+    return spawnPoint;
 }
 
 // User Input implementation

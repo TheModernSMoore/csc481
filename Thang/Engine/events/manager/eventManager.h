@@ -1,5 +1,7 @@
 #pragma once
 #include "../eventHandling/eventHandler.h"
+#include <list>
+#include <queue>
 
 
 class EventManager
@@ -13,7 +15,7 @@ class EventManager
         static std::map<EventType, std::list<EventHandler *>> handlers;
         // Vector of currently raised events waiting to be handled
         // JUST ITERATE THORUGH AND LOWER PRIORITY AND IF < 0 HANDLE IT IF NOT DON'T LEL
-        static std::vector<Event *> raised_events;
+        static std::priority_queue<Event*, std::vector<Event*>, std::greater<Event*>>  raised_events;
     
     public:
         // Mutex to ensure events are handled appropriately

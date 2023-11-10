@@ -1,5 +1,7 @@
 #pragma once
-#include "../abtype/event.h"
+#include "../manager/eventManager.h"
+#include "../event/event.h"
+#include "../../objects/manager/objectManager.h"
 
 class EventHandler
 {
@@ -18,7 +20,7 @@ class CharCollideHandler : public EventHandler
         // Constructors
         CharCollideHandler();
         // Function that actually handles the event
-        virtual void onEvent(Event e) = 0;
+        virtual void onEvent(Event e);
 };
 
 
@@ -28,7 +30,7 @@ class CharDeathHandler : public EventHandler
         // Constructors
         CharDeathHandler();
         // Function that actually handles the event
-        virtual void onEvent(Event e) = 0;
+        virtual void onEvent(Event e);
 };
 
 
@@ -38,7 +40,7 @@ class CharSpawnHandler : public EventHandler
         // Constructors
         CharSpawnHandler();
         // Function that actually handles the event
-        virtual void onEvent(Event e) = 0;
+        virtual void onEvent(Event e);
 };
 
 
@@ -48,5 +50,5 @@ class InputHandler : public EventHandler
         // Constructors
         InputHandler();
         // Function that actually handles the event
-        virtual void onEvent(Event e) = 0;
+        virtual void onEvent(Event e);
 };
