@@ -1,8 +1,11 @@
 #pragma once
 #include "../eventHandling/eventHandler.h"
+#include "../event/event.h"
+#include "../../objects/manager/objectManager.h"
 #include <list>
 #include <queue>
 
+class EventHandler;
 
 class EventManager
 {

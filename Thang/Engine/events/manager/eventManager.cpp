@@ -19,31 +19,34 @@ EventManager* EventManager::get() {
 
 void EventManager::addEventToHandler(std::list<EventType> types, EventHandler *handler) {
     for (EventType & type : types) {
-        handlers.at(type).push_back(handler);
+        handlers[type].push_back(handler);
     }
 }
 
 void EventManager::removeEventFromHandler(std::list<EventType> types, EventHandler *handler) {
-    // for (EventType & type : types) {
-    //     // Ion even know
-    // }
+    for (EventType & type : types) {
+        handlers[type].erase(std::remove(handlers[type].begin(), handlers[type].end(), handler), handlers[type].end());
+    }
 }
 
 void EventManager::raise(Event *e) {
-    raised_events.push_back(e);
+    raised_events.push(e);
 }
 
 void EventManager::handleEvents() {
     int64_t currTime = TimeManager::get()->getTimelines().at(0)->getCurrentTime();
     while (!raised_events.empty()) {
-        Event *current = raised_events.pop();
+        Event *current = raised_events.top();
+        raised_events.pop();
         // If the next event is supposed to happen in the future, don't handle it
         if (current->getStamp() > currTime) {
             raised_events.push(current);
             break;
         }
-        for (auto & handler : handlers.at(current->getType())) {
+        
+        for (auto & handler : handlers[current->getType()]) {
             handler->onEvent(current);
         }
+        delete current;
     }
 }

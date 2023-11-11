@@ -1,21 +1,14 @@
 #pragma once
 #include <nlohmann/json.hpp>
-#include "../../objects/abtype/object.h"
 #include "../../timeline/timeManager.h"
 #include "../../objects/manager/objectManager.h"
+#include "eventType.h"
+
+class Object;
 
 class Character;
 
 class SpawnPoint;
-
-class Object;
-
-enum EventType {
-    USER_INPUT,
-    CHARACTER_COLLISION,
-    CHARACTER_DEATH,
-    CHARACTER_SPAWN
-};
 
 class Event
 {

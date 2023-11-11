@@ -10,6 +10,9 @@
 #include "../deathBox.h"
 #include "../../timeline/timeManager.h"
 #include "../common.h"
+#include "../../events/manager/eventManager.h"
+
+class EventManager;
 
 class Object;
 

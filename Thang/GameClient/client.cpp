@@ -150,7 +150,7 @@ int main(int argc, char const *argv[])
             } else {
                 objects_not_recv.push_back(object);
             }
-            if (!my_character && ident == character_ident) {
+            if (ident == character_ident) {
                 my_character = dynamic_cast<Character *>(object);
             }
         }

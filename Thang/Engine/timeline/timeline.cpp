@@ -9,7 +9,7 @@ Timeline::Timeline(Timeline *anchor, int64_t tic)
     current_time = start_time;
     last_time = current_time;
     delta_time = 0;
-    for (int i = 0; i < W; i++) {
+    for (int i = 0; i < 5; i++) {
         delta_times[i] = 0;
     }
     
@@ -31,10 +31,10 @@ void Timeline::setTime()
     if (anchor) {
         current_time = (anchor->getCurrentTime() - start_time) / tic;
         if (!paused) {
-            delt_idx = (delt_idx + 1) % W;
+            delt_idx = (delt_idx + 1) % 5;
             delta_times[delt_idx] = current_time - last_time;
             int sum = 0;
-            for (int i = 0; i < W; i++)
+            for (int i = 0; i < 5; i++)
             {
                 sum += delta_times[i];
             }
@@ -88,7 +88,7 @@ void Timeline::cycleTic()
 
 void Timeline::setTic(int64_t newTic)
 {
-    for (int i = 0; i < W; i++)
+    for (int i = 0; i < 5; i++)
     {
         delta_times[i] = delta_times[i] * tic / newTic;
     }

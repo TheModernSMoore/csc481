@@ -44,15 +44,9 @@ sf::Vector2f DeathBox::getPoint(std::size_t index) const
 
 void DeathBox::logic()
 {
+    // PLACE THIS INSIDE OF CHECKCOLLISION OF COLLIDE AREA
     // Change to event on collision later
-    ObjectManager *objectManager = ObjectManager::get();
-    std::vector<Object*> tokill;
-    for (auto & object : objectManager->overlappedBodies(this)) {
-        if (object->getObjectType().compare("Character") == 0) {
-            // Change to death event later
-            EventManager::get()->raise(new CharacterCollision(object, this));
-        }
-    }
+    collision_area->checkCollision(this);
 }
 
 json DeathBox::toClientJSON()

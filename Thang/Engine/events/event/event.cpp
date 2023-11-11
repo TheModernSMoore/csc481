@@ -1,6 +1,4 @@
 #include "event.h"
-#include "../../objects/character.h"
-#include "../../objects/spawnPoint.h"
 
 using json = nlohmann::json;
 
@@ -33,6 +31,7 @@ json Event::clientJSONHelper() {
 // Character collision implementation
 
 CharacterCollision::CharacterCollision(Character *character_collided, Object *collided_with_character) {
+    type = CHARACTER_COLLISION;
     character = character_collided;
     collided_with = collided_with_character;
 }
@@ -54,7 +53,7 @@ Character* CharacterCollision::getCharacter() {
 
 // Character death implementation
 
-CharacterDeath::CharacterDeath(Character *character_to_die, ) {
+CharacterDeath::CharacterDeath(Character *character_to_die) {
     type = CHARACTER_DEATH;
     character = character_to_die;
     
@@ -73,8 +72,10 @@ Character* CharacterDeath::getCharacter() {
 // Character spawn implementation
 
 CharacterSpawn::CharacterSpawn(Character *character_to_spawn, SpawnPoint *place_to_spawn) {
+    type = CHARACTER_SPAWN;
     character = character_to_spawn;
     spawnPoint = place_to_spawn;
+    time_stamp += 3 * 1000000;
 }
 
 json CharacterSpawn::toClientJSON() {
@@ -94,7 +95,8 @@ SpawnPoint* CharacterSpawn::getSpawn() {
 
 // User Input implementation
 
-UserInput::UserInput() {
+UserInput::UserInput(Character *character_controlled) {
+    type = USER_INPUT;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
         input_string += std::string("l");
     }

@@ -4,7 +4,7 @@
 #include <SFML/System/Time.hpp>
 #include <cstdint>
 
-#define W 5
+// #define W 5
 
 class Timeline
 {
@@ -26,7 +26,7 @@ class Timeline
         // Clock to gather real time from
         sf::Clock clock;
         // Array of delta-times to gather an average from
-        int64_t delta_times[W];
+        int64_t delta_times[5];
         // The delta time to report
         int64_t delta_time;
         // index of delta time to replace

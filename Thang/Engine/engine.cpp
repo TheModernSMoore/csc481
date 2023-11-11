@@ -1,11 +1,11 @@
 #include <SFML/Window.hpp>
 #include "objects/manager/objectManager.h"
 #include "timeline/timeManager.h"
+#include "events/manager/eventManager.h"
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include "events/manager/eventManager.h"
 
 using json = nlohmann::json;
 
@@ -163,6 +163,11 @@ int main(int argc, char const *argv[])
 
     objectManager->addObject(&spawner);
 
+    SpawnPoint spawner2;
+    spawner2.setPosition(800, 550);
+
+    objectManager->addObject(&spawner2);
+
     DeathBox pit(sf::Vector2f(1800.f, 50.f));
     pit.setPosition(0, 650);
 
@@ -189,7 +194,7 @@ int main(int argc, char const *argv[])
 
     // do not ask why this is necessary, IF I WERE TO CREATE 1 MORE OBJECT, THEY WOULD NOT APPEAR
     // AND THIS FIXED IT
-    for (int i = 0; i < W; i++)  
+    for (int i = 0; i < 5; i++)  
     {
         realTime.setTime();
         localTime.setTime();
