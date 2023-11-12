@@ -63,7 +63,7 @@ class PauseHandler : public EventHandler
         PauseHandler();
         // Function that actually handles the event
         virtual void onEvent(Event *e);
-}
+};
 
 class SpeedHandler : public EventHandler
 {
@@ -72,4 +72,4 @@ class SpeedHandler : public EventHandler
         SpeedHandler();
         // Function that actually handles the event
         virtual void onEvent(Event *e);
-}
+};

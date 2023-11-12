@@ -31,6 +31,8 @@ class EventManager
         void removeEventFromHandler(std::list<EventType> types, EventHandler *handler);
         // Raises an event to be queued up
         void raise(Event *e);
+        // Raises an event from a json
+        void raise(nlohmann::json jevent);
         // This will get called every update cycle
         void handleEvents();
 };

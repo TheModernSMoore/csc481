@@ -115,3 +115,23 @@ Character* UserInput::getCharacter() {
 std::string UserInput::getInputString() {
     return input_string;
 }
+
+// Pause Event implementation
+
+Pause::Pause() {
+    type = PAUSE;
+}
+
+json Pause::toClientJSON() {
+    return clientJSONHelper();
+}
+
+// Cycle Speed Event implementation
+
+CycleSpeed::CycleSpeed() {
+    type = CYCLE_SPEED;
+}
+
+json CycleSpeed::toClientJSON() {
+    return clientJSONHelper();
+}

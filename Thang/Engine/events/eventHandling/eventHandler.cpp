@@ -91,7 +91,12 @@ PauseHandler::PauseHandler() {}
 
 void PauseHandler::onEvent(Event *e) {
     if (e->getType() == PAUSE) {
-        TimeManager::get()->getTimelines().at(1)->pause();
+        Timeline *local = TimeManager::get()->getTimelines().at(1);
+        if (local->isPaused()) {
+            local->unpause();
+        } else {
+            local->pause();
+        }
     }
 }
 

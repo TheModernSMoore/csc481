@@ -1,5 +1,7 @@
 #include "eventManager.h"
 
+using json = nlohmann::json;
+
 std::mutex EventManager::mutex;
 
 EventManager* EventManager::inst = NULL;
@@ -31,6 +33,18 @@ void EventManager::removeEventFromHandler(std::list<EventType> types, EventHandl
 
 void EventManager::raise(Event *e) {
     raised_events.push(e);
+}
+
+void EventManager::raise(json jevent) {
+    std::map<int, Object*> objectMap = ObjectManager::get()->getObjects();
+    EventType type = jevent["Type"];
+    if (type == PAUSE) {
+        raise(new Pause);
+    } else if (type == CYCLE_SPEED) {
+        raise(new CycleSpeed);
+    } else {
+        std::cout << "No event raised from client" << std::endl;
+    }
 }
 
 void EventManager::handleEvents() {

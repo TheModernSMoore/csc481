@@ -52,16 +52,26 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
         if (res) {
             // Might be able to put all this in a seperate PUB/SUB socket just so each client isn't asking for this each time
             std::unique_lock<std::mutex> lock(*m);
-            inputs->at(client_number - 1) = input_message.to_string();
-            std::map<int, Object*> objects = objectManager->getObjects();
-            int size = objects.size();
-            int current = 0;
-            for (auto pair : objects) {
-                Object* object = pair.second;
-                current++;
-                json client_json = object->toClientJSON();
-                std::string to_send = to_string(client_json);
-                comsock.send(zmq::buffer(to_send), current < size ? zmq::send_flags::sndmore : zmq::send_flags::none);
+            json recved_json = json::parse(input_message.to_string());
+            EventManager *eventManager = EventManager::get();
+            if (recved_json["Type"] == PAUSE) {
+                eventManager->raise(new Pause);
+                comsock.send(zmq::buffer("ok"));
+            } else if (recved_json["Type"] == CYCLE_SPEED) {
+                eventManager->raise(new CycleSpeed);
+                comsock.send(zmq::buffer("ok"));
+            } else {
+                inputs->at(client_number - 1) = recved_json["Input"];
+                std::map<int, Object*> objects = objectManager->getObjects();
+                int size = objects.size();
+                int current = 0;
+                for (auto pair : objects) {
+                    Object* object = pair.second;
+                    current++;
+                    json client_json = object->toClientJSON();
+                    std::string to_send = to_string(client_json);
+                    comsock.send(zmq::buffer(to_send), current < size ? zmq::send_flags::sndmore : zmq::send_flags::none);
+                }
             }
             time_since_recv = 0;
         } else {
@@ -220,8 +230,8 @@ int main(int argc, char const *argv[])
                     eventManager->raise(new UserInput(characters.at(idx++), input));
                 }
             }
+            eventManager->handleEvents();
             if(!(localTime.isPaused())) {
-                eventManager->handleEvents();
                 objectManager->updateObjects();
             }
 

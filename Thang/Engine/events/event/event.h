@@ -114,15 +114,17 @@ class UserInput : public Event
 
 class Pause : public Event
 {
-    Pause();
-    // To json function
-    virtual nlohmann::json toClientJSON();
-}
+    public:
+        Pause();
+        // To json function
+        virtual nlohmann::json toClientJSON();
+};
 
 
 class CycleSpeed : public Event
 {
-    CycleSpeed();
-    // To json function
-    virtual nlohmann::json toClientJSON();
-}
+    public:
+        CycleSpeed();
+        // To json function
+        virtual nlohmann::json toClientJSON();
+};

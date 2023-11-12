@@ -103,13 +103,21 @@ int main(int argc, char const *argv[])
                 window.close();
             if (event.type == sf::Event::KeyPressed) {
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::P)) {
-                    input += std::string("c"); // This will be deleted once parsed
+                    // Create Cycle Speed event
+                    json speed_json;
+                    speed_json["Type"] = CYCLE_SPEED;
+                    mainket.send(zmq::buffer(to_string(speed_json)));
+                    zmq::message_t idc;
+                    auto res = mainket.recv(idc);
                 }
-                // Create Cycle Time event
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
-                    input += std::string("p"); // This will be deleted once parsed
+                    // Create Pause Time event
+                    json pause_json;
+                    pause_json["Type"] = PAUSE;
+                    mainket.send(zmq::buffer(to_string(pause_json)));
+                    zmq::message_t idc;
+                    auto res = mainket.recv(idc);
                 }
-                // Create Pause Time event
             }
             if (event.type == sf::Event::LostFocus)
                 in_focus = false;
@@ -125,7 +133,10 @@ int main(int argc, char const *argv[])
         // MAYBE DO SIMILAR THING THAT SERVER DOES WHERE WE HAVE A SEPERATE THREAD THAT HANDLES INTERACTIONS THROUGH THE SOCKETS THEN HAVE CLIENT CALCULATIONS DONE IN MAIN
 
         // SEND OVER EVENTS HERE WITH SEND MORE AS WELL
-        mainket.send(zmq::buffer(input));
+        json inp_json;
+        inp_json["Type"] = -1;
+        inp_json["Input"] = input;
+        mainket.send(zmq::buffer(to_string(inp_json)));
 
         // clear the window with black color
         window.clear(sf::Color::Black);
