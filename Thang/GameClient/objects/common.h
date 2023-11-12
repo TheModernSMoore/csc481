@@ -1,5 +1,7 @@
 #pragma once
 
+class Object;
+
 typedef struct object_body {
     bool physicsAffected;
     sf::Vector2f velocity;
@@ -16,5 +18,5 @@ typedef struct object_visible {
 
 
 typedef struct object_collision_area {
-
+    void (*checkCollision)(Object *);
 } object_collision_area;

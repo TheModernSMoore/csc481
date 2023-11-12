@@ -102,10 +102,22 @@ void Object::setBody(bool affected)
     body->velocity.y = 0;
 }
 
+void checkCollision(Object *toCheck) {
+    ObjectManager *objectManager = ObjectManager::get();
+    std::vector<Object*> tokill;
+    for (auto & object : objectManager->overlappedBodies(toCheck)) {
+        if (object->getObjectType().compare("Character") == 0) {
+            // Change to death event later
+            EventManager::get()->raise(new CharacterCollision((Character *)object, toCheck));
+        }
+    }
+}
+
 void Object::setCollisionArea()
 {
     // parts of struct to set
     collision_area = new object_collision_area;
+    collision_area->checkCollision = checkCollision;
 }
 
 void Object::setVisible()

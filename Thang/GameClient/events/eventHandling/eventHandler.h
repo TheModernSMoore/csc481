@@ -54,22 +54,3 @@ class InputHandler : public EventHandler
         // Function that actually handles the event
         virtual void onEvent(Event *e);
 };
-
-
-class PauseHandler : public EventHandler
-{
-    public:
-        // Constructors
-        PauseHandler();
-        // Function that actually handles the event
-        virtual void onEvent(Event *e);
-}
-
-class SpeedHandler : public EventHandler
-{
-    public:
-        // Constructors
-        SpeedHandler();
-        // Function that actually handles the event
-        virtual void onEvent(Event *e);
-}

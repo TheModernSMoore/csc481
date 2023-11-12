@@ -92,6 +92,7 @@ class CharacterSpawn : public Event
 };
 
 
+// This will most likely be raised on client but handled on server (with current implementation)
 class UserInput : public Event
 {
     private:
@@ -110,19 +111,3 @@ class UserInput : public Event
         // gets the input string
         std::string getInputString();
 };
-
-
-class Pause : public Event
-{
-    Pause();
-    // To json function
-    virtual nlohmann::json toClientJSON();
-}
-
-
-class CycleSpeed : public Event
-{
-    CycleSpeed();
-    // To json function
-    virtual nlohmann::json toClientJSON();
-}

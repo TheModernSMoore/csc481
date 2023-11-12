@@ -47,6 +47,7 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
     float time_since_recv = 0;
     while (1) {
         zmq::message_t input_message;
+        // DO RECVMORE AND DONT WAIT SO WE CAN FIND AND CONSTRUCT EVENTS FROM CLIENT
         auto res = comsock.recv(input_message, zmq::recv_flags::dontwait);
         if (res) {
             // Might be able to put all this in a seperate PUB/SUB socket just so each client isn't asking for this each time
@@ -190,6 +191,9 @@ int main(int argc, char const *argv[])
     eventManager->addEventToHandler(std::list<EventType> {CHARACTER_COLLISION}, new CharCollideHandler);
     eventManager->addEventToHandler(std::list<EventType> {CHARACTER_DEATH}, new CharDeathHandler);
     eventManager->addEventToHandler(std::list<EventType> {CHARACTER_SPAWN}, new CharSpawnHandler);
+    eventManager->addEventToHandler(std::list<EventType> {USER_INPUT}, new InputHandler);
+    eventManager->addEventToHandler(std::list<EventType> {PAUSE}, new PauseHandler);
+    eventManager->addEventToHandler(std::list<EventType> {CYCLE_SPEED}, new SpeedHandler);
 
 
     // do not ask why this is necessary, IF I WERE TO CREATE 1 MORE OBJECT, THEY WOULD NOT APPEAR
@@ -212,29 +216,18 @@ int main(int argc, char const *argv[])
             bool swap_pause = false;
             bool cycle_tic = false;
             for (auto & input : inputs) {
-                size_t place;
-                if ((place = input.find("p")) != std::string::npos) {
-                    swap_pause = true;
-                    input.erase(place, 1);
-                    localTime.isPaused() ? localTime.unpause() : localTime.pause();
-                }
-                if ((place = input.find("c")) != std::string::npos) {
-                    cycle_tic = true;
-                    input.erase(place, 1);
-                    localTime.cycleTic();
-                }
                 if(!(localTime.isPaused())) {
-                    characters.at(idx++)->input(input);
+                    eventManager->raise(new UserInput(characters.at(idx++), input));
                 }
             }
             if(!(localTime.isPaused())) {
-                objectManager->updateObjects();
                 eventManager->handleEvents();
+                objectManager->updateObjects();
             }
 
             // window.clear(sf::Color::Black);
 
-            // for (auto & [key, value] : objectManager->getVisibles()) {
+            // for (auto & [key, value] : objectManager->getObjects()) {
             //     window.draw(*value);
             // }
             // window.display();

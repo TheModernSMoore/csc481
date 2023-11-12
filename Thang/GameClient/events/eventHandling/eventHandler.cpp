@@ -84,24 +84,3 @@ void InputHandler::onEvent(Event *e) {
         inp->getCharacter()->input(inp->getInputString());
     }
 }
-
-// Pause Handler implementation
-
-PauseHandler::PauseHandler() {}
-
-void PauseHandler::onEvent(Event *e) {
-    if (e->getType() == PAUSE) {
-        TimeManager::get()->getTimelines().at(1)->pause();
-    }
-}
-
-// Cycle Speed implementation
-
-
-SpeedHandler::SpeedHandler() {}
-
-void SpeedHandler::onEvent(Event *e) {
-    if (e->getType() == CYCLE_SPEED) {
-        TimeManager::get()->getTimelines().at(1)->cycleTic();
-    }
-}

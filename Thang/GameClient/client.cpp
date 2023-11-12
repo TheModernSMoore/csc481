@@ -105,9 +105,11 @@ int main(int argc, char const *argv[])
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::P)) {
                     input += std::string("c"); // This will be deleted once parsed
                 }
+                // Create Cycle Time event
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
                     input += std::string("p"); // This will be deleted once parsed
                 }
+                // Create Pause Time event
             }
             if (event.type == sf::Event::LostFocus)
                 in_focus = false;
@@ -121,6 +123,8 @@ int main(int argc, char const *argv[])
         }
 
         // MAYBE DO SIMILAR THING THAT SERVER DOES WHERE WE HAVE A SEPERATE THREAD THAT HANDLES INTERACTIONS THROUGH THE SOCKETS THEN HAVE CLIENT CALCULATIONS DONE IN MAIN
+
+        // SEND OVER EVENTS HERE WITH SEND MORE AS WELL
         mainket.send(zmq::buffer(input));
 
         // clear the window with black color
