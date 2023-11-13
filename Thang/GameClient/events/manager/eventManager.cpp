@@ -2,8 +2,6 @@
 
 using json = nlohmann::json;
 
-std::mutex EventManager::mutex;
-
 EventManager* EventManager::inst = NULL;
 
 std::map<EventType, std::list<EventHandler *>> EventManager::handlers;

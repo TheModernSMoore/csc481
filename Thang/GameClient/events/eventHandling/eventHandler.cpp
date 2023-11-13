@@ -34,20 +34,8 @@ void CharDeathHandler::onEvent(Event *e) {
         // (maybe before above) find nearest spawn point and
         // throw all that into a spawn event
         // Find spawn point closes to character on the left
-        ObjectManager *objectManager = ObjectManager::get();
-        float shortest_dist = std::numeric_limits<float>::max();
-        SpawnPoint *shortest_to = nullptr;
-        for (auto & [key, object] : objectManager->getObjects()) {
-            if (object->getObjectType().compare("SpawnPoint") == 0) {
-                float distance = dea->getCharacter()->getPosition().x - object->getPosition().x;
-                if (distance >= 0 && distance < shortest_dist) {
-                    shortest_dist = distance;
-                    shortest_to = (SpawnPoint *) object;
-                }
-            }
-        }
         ObjectManager::get()->removeObject(dea->getCharacter());
-        EventManager::get()->raise(new CharacterSpawn(dea->getCharacter(), shortest_to));
+        EventManager::get()->raise(new CharacterSpawn(dea->getCharacter()));
     }
 }
 
@@ -63,9 +51,21 @@ void CharSpawnHandler::onEvent(Event *e) {
         // spawn point, then re-add it to the list of stuff
         // OR HAVE DEAD STATE ON CHARACTER CAUSE THAT MAY DO
         // SOME FINIKY STUFF WITH CLIENT
+        ObjectManager *objectManager = ObjectManager::get();
+        float shortest_dist = std::numeric_limits<float>::max();
+        SpawnPoint *shortest_to = nullptr;
+        for (auto & [key, object] : objectManager->getObjects()) {
+            if (object->getObjectType().compare("SpawnPoint") == 0) {
+                float distance = spa->getCharacter()->getPosition().x - object->getPosition().x;
+                if (distance >= 0 && distance < shortest_dist) {
+                    shortest_dist = distance;
+                    shortest_to = (SpawnPoint *) object;
+                }
+            }
+        }
 
         ObjectManager::get()->addObject(spa->getCharacter());
-        spa->getCharacter()->setPosition(spa->getSpawn()->getPosition());
+        spa->getCharacter()->setPosition(shortest_to->getPosition());
     }
 }
 
@@ -91,7 +91,12 @@ PauseHandler::PauseHandler() {}
 
 void PauseHandler::onEvent(Event *e) {
     if (e->getType() == PAUSE) {
-        TimeManager::get()->getTimelines().at(1)->pause();
+        Timeline *local = TimeManager::get()->getTimelines().at(1);
+        if (local->isPaused()) {
+            local->unpause();
+        } else {
+            local->pause();
+        }
     }
 }
 

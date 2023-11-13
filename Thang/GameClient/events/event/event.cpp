@@ -71,26 +71,20 @@ Character* CharacterDeath::getCharacter() {
 
 // Character spawn implementation
 
-CharacterSpawn::CharacterSpawn(Character *character_to_spawn, SpawnPoint *place_to_spawn) {
+CharacterSpawn::CharacterSpawn(Character *character_to_spawn) {
     type = CHARACTER_SPAWN;
     character = character_to_spawn;
-    spawnPoint = place_to_spawn;
     time_stamp += 3 * 1000000;
 }
 
 json CharacterSpawn::toClientJSON() {
     json output = clientJSONHelper();
     output["CharacterID"] = character->identifier;
-    output["SpawnPointID"] = spawnPoint->identifier;
     return output;
 }
 
 Character* CharacterSpawn::getCharacter() {
     return character;
-}
-
-SpawnPoint* CharacterSpawn::getSpawn() {
-    return spawnPoint;
 }
 
 // User Input implementation

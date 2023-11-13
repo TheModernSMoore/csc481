@@ -21,8 +21,6 @@ class EventManager
         static std::priority_queue<Event*, std::vector<Event*>, std::greater<Event*>>  raised_events;
     
     public:
-        // Mutex to ensure events are handled appropriately
-        static std::mutex mutex;
         // gets the single instance of the Manager
         static EventManager* get();
         // Adds an event handler with the types of events
