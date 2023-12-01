@@ -3,44 +3,44 @@ src := $(call rwildcard,./,*.cpp)
 
 obj = $(patsubst %.cpp,%.o,$(src))
 
-LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -pthread -lzmq
+LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -lv8 -pthread -lzmq
 
-INTELMAC_INCLUDEDIR=/usr/local/include			# Intel mac
-APPLESILICON_INCLUDEDIR=/opt/homebrew/include	# Apple Silicon
-UBUNTU_APPLESILICON_INCLUDEDIR=/usr/include		# Apple Silicon Ubuntu VM
-UBUNTU_INTEL_INCLUDEDIR=/usr/include			# Intel Ubuntu VM
+INTELMAC_INCLUDE=-I/usr/local/include							# Intel mac
+APPLESILICON_INCLUDE=-I/opt/homebrew/include					# Apple Silicon
+UBUNTU_APPLESILICON_INCLUDE=-I/usr/include -I/usr/include/v8	# Apple Silicon Ubuntu VM
+UBUNTU_INTEL_INCLUDE=-I/usr/include -I/usr/include/v8			# Intel Ubuntu VM
 
-INTELMAC_LIBPATH=/usr/local/lib 							# Intel mac
-APPLESILICON_LIBPATH=/opt/homebrew/lib						# Apple Silicon
-UBUNTU_APPLESILICON_LIBPATH=/usr/lib/aarch64-linux-gnu		# Apple Silicon Ubuntu VM
-UBUNTU_INTEL_LIBPATH=/usr/lib/x86_64-linux-gnu				# Intel Ubuntu VM
+INTELMAC_LIB=-L/usr/local/lib									# Intel mac
+APPLESILICON_LIB=-L/opt/homebrew/lib							# Apple Silicon
+UBUNTU_APPLESILICON_LIB=-L/usr/lib/aarch64-linux-gnu			# Apple Silicon Ubuntu VM
+UBUNTU_INTEL_LIB=-L/usr/lib/x86_64-linux-gnu					# Intel Ubuntu VM
 
-MACOS_INCLUDE=$(APPLESILICON_INCLUDEDIR)
-MACOS_LIB=$(APPLESILICON_LIBPATH)
-UBUNTU_INCLUDE=$(UBUNTU_APPLESILICON_INCLUDEDIR)
-UBUNTU_LIB=$(UBUNTU_APPLESILICON_LIBPATH)
+MACOS_INCLUDE=$(APPLESILICON_INCLUDE)
+MACOS_LIB=$(APPLESILICON_LIB)
+UBUNTU_INCLUDE=$(UBUNTU_APPLESILICON_INCLUDE)
+UBUNTU_LIB=$(UBUNTU_APPLESILICON_LIB)
 
 MACOS_COMPILER=/usr/bin/clang++
 UBUNTU_COMPILER=/usr/bin/g++
 
-all: client
+all: main
 
 uname_s := $(shell uname -s)
-client: $(obj)
+main: $(obj)
 ifeq ($(uname_s),Darwin)
-	$(MACOS_COMPILER) -o $@ $^ $(LDFLAGS) -L$(MACOS_LIB)
+	$(MACOS_COMPILER) -std=c++17 -o $@ $^ $(LDFLAGS) $(MACOS_LIB)
 else ifeq ($(uname_s),Linux)
-	$(UBUNTU_COMPILER) -o $@ $^ $(LDFLAGS) -L$(UBUNTU_LIB)
+	$(UBUNTU_COMPILER) -std=c++17 -o $@ $^ $(LDFLAGS) $(UBUNTU_LIB)
 endif
 
 uname_s := $(shell uname -s)
 %.o: %.cpp
 ifeq ($(uname_s),Darwin)
-	$(MACOS_COMPILER) -c $^ -o $@ -I$(MACOS_INCLUDE)
+	$(MACOS_COMPILER) -std=c++17 -c $^ -o $@ $(MACOS_INCLUDE)
 else ifeq ($(uname_s),Linux)
-	$(UBUNTU_COMPILER) -c $^ -o $@ -I$(UBUNTU_INCLUDE)
+	$(UBUNTU_COMPILER) -std=c++17 -c $^ -o $@ $(UBUNTU_INCLUDE)
 endif
 
 .PHONY: clean
 clean:
-	rm -f $(obj) client
+	rm -f $(obj) main
