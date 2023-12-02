@@ -12,6 +12,7 @@ using json = nlohmann::json;
 
 std::mutex Object::movetex;
 std::mutex Object::createtex;
+std::string Object::current_guid;
 
 int Object::objects_made = 0;
 
@@ -19,13 +20,9 @@ Object::Object()
 {
     std::unique_lock<std::mutex> lock(createtex);
     identifier = objects_made++;
-    guid = std::string("Object") /* + std::to_string(identifier)*/;
-    { // anonymous scope for managing handle scope
-        v8::Isolate::Scope isolate_scope(ScriptManager::getContextContainer().isolate); // must enter the virtual machine to do stuff
-        v8::HandleScope handle_scope(ScriptManager::getContextContainer().isolate);
-        v8::Context::Scope default_context_scope(ScriptManager::getContextContainer().context); // enter the context
-        ScriptManager::get()->runOne("hello_world", false);
-    }
+    guid = std::string("Object") + std::to_string(identifier);
+    current_guid = guid;
+    ScriptManager::get()->runOne("hello_world", false);
 }
 
 std::string Object::getObjectType()
@@ -270,6 +267,11 @@ v8::Local<v8::Object> Object::exposeToV8(v8::Isolate *isolate, v8::Local<v8::Con
 	v.push_back(v8helpers::ParamContainer("x", getObjectX, setObjectX));
 	v.push_back(v8helpers::ParamContainer("y", getObjectY, setObjectY));
 	v.push_back(v8helpers::ParamContainer("guid", getObjectGUID, setObjectGUID));
+    v.push_back(v8helpers::ParamContainer("curr_guid", getObjectCurrGUID, setObjectCurrGUID));
+    if (body) {
+        v.push_back(v8helpers::ParamContainer("velX", getObjectVelX, setObjectVelX));
+        v.push_back(v8helpers::ParamContainer("velY", getObjectVelY, setObjectVelY));
+    }
 	return v8helpers::exposeToV8(guid, this, v, isolate, context, context_name);
 }
 
@@ -335,4 +337,57 @@ void Object::getObjectGUID(v8::Local<v8::String> property, const v8::PropertyCal
 	std::string guid = static_cast<Object*>(ptr)->guid;
 	v8::Local<v8::String> v8_guid = v8::String::NewFromUtf8(info.GetIsolate(), guid.c_str(), v8::String::kNormalString);
 	info.GetReturnValue().Set(v8_guid);
+}
+
+void Object::setObjectCurrGUID(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
+{
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+	v8::String::Utf8Value utf8_str(info.GetIsolate(), value->ToString());
+	static_cast<Object*>(ptr)->current_guid = *utf8_str;
+}
+
+void Object::getObjectCurrGUID(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
+{
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+	std::string current_guid = static_cast<Object*>(ptr)->current_guid;
+	v8::Local<v8::String> v8_guid = v8::String::NewFromUtf8(info.GetIsolate(), current_guid.c_str(), v8::String::kNormalString);
+	info.GetReturnValue().Set(v8_guid);
+}
+
+void Object::setObjectVelX(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
+{
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+	static_cast<Object*>(ptr)->body->velocity.x = value->Int32Value();
+}
+
+void Object::getObjectVelX(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
+{
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+	int x_val = static_cast<Object*>(ptr)->body->velocity.x;
+	info.GetReturnValue().Set(x_val);
+}
+
+void Object::setObjectVelY(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
+{
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+	static_cast<Object*>(ptr)->body->velocity.y = value->Int32Value();
+}
+
+void Object::getObjectVelY(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
+{
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+	int y_val = static_cast<Object*>(ptr)->body->velocity.y;
+	info.GetReturnValue().Set(y_val);
 }

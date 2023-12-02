@@ -39,6 +39,8 @@ class Object : public sf::Shape
 		static void getObjectY(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
 		static void setObjectGUID(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
 		static void getObjectGUID(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
+        static void setObjectCurrGUID(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
+		static void getObjectCurrGUID(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
 
     protected:
         // the mutex used for safe movement in all objects, hence protected and static
@@ -67,6 +69,9 @@ class Object : public sf::Shape
         object_visible *visible = nullptr;
 
         object_collision_area *collision_area = nullptr;
+
+        // keeps track of the current guid to be used in scripts
+        static std::string current_guid;
 
 
         //Constructor and destructor below

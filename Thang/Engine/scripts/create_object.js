@@ -1,9 +1,5 @@
-//
-// This cript calls gameobjectfactory() to create a new game object, and
-// recievs it's handle. 
-//
-// NOTE: gameobjectfactory is a static function added to the global context in
-// the native main() function
-//
-// var object = // somehow get guid from object calling
-// print("Received new object: " +  .guid)
+// Uses Object0 as hopefully there will always be an Object0
+// to find the Object guid that is listed in the static curr_guid of Object
+var object = gethandle(Object0.curr_guid) 
+// Then do stuff with said object
+print("Received new object: " +  object.guid)

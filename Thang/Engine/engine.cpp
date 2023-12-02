@@ -179,7 +179,7 @@ int main(int argc, char const *argv[])
 
 		// Use the following 4 lines in place of the above 4 lines as the
 		// reference if you don't plan to use multiple contexts
-		// sm->addScript("create_object", "scripts/create_object.js");
+		sm->addScript("create_object", "scripts/create_object.js");
 		/* sm->addScript("random_object", "scripts/random_object.js"); */
 		/* sm->addScript("random_position", "scripts/random_position.js"); */
 		/* sm->addScript("modify_position", "scripts/modify_position.js"); */
@@ -200,40 +200,19 @@ int main(int argc, char const *argv[])
 
         ObjectManager *objectManager = ObjectManager::get();
 
-        std::cout << "jfas" << std::endl;
-
         Platform morb(sf::Vector2f(120.f, 25.f));
-
-        std::cout << "jfas" << std::endl;
-
         morb.setPosition(215.f, 250.f);
-
-        std::cout << "jfas" << std::endl;
-
         std::vector<sf::Vector2f> morb_set;
         morb_set.push_back(sf::Vector2f(215.f, 450.f));
-
-        std::cout << "jfas" << std::endl;
-
-
         morb_set.push_back(sf::Vector2f(215.f, 250.f));
-        std::cout << "jfas" << std::endl;
-        // morb.setToGo(morb_set);
-        std::cout << "jfas" << std::endl;
+        morb.setToGo(morb_set);
         morb.setSpeed(2);
-        std::cout << "jfas" << std::endl;
         morb.setFillColor(sf::Color::Blue);
 
-        std::cout << "jfas" << std::endl;
-
         objectManager->addObject(&morb);
-
-        std::cout << "jfas" << std::endl;
-
-
         morb.exposeToV8(isolate, default_context);
 
-        std::cout << "jfas" << std::endl;
+        sm->runOne("create_object", false);
 
         Platform borb(sf::Vector2f(120.f, 25.f));
         borb.setPosition(375.f, 450.f);
@@ -249,6 +228,8 @@ int main(int argc, char const *argv[])
         objectManager->addObject(&borb);
         borb.exposeToV8(isolate, default_context);
 
+        sm->runOne("create_object", false);
+
         Platform ground(sf::Vector2f(600.f, 25.f));
         ground.setPosition(0, 600 - 25);
         ground.setTexturePath("img/grass.jpg");
@@ -256,6 +237,8 @@ int main(int argc, char const *argv[])
 
         objectManager->addObject(&ground);
         ground.exposeToV8(isolate, default_context);
+
+        sm->runOne("create_object", false);
 
         Platform ground_again(sf::Vector2f(550.f, 25.f));
         ground_again.setPosition(650, 600 - 25);
