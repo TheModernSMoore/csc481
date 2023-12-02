@@ -7,6 +7,8 @@
 #include <nlohmann/json.hpp>
 #include <cmath>
 #include <iostream>
+#include <utility>
+#include <v8.h>
 // #include "../../events/manager/eventManager.h"
 
 #define DOWN_ACCEL 0.3
@@ -21,6 +23,22 @@ class Object : public sf::Shape
         static int objects_made;
         // mutex for objects_made increment and storing as identifiers
         static std::mutex createtex;
+
+        v8::Isolate* isolate;
+		v8::Global<v8::Context>* context;
+
+        /**
+		 * NOTE: These "Accessors" have to be **static**
+		 *
+		 * You will need to implement a setter and getter for every class
+		 * member variable you want accessible to javascript.
+		 */
+		static void setObjectX(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
+		static void getObjectX(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
+		static void setObjectY(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
+		static void getObjectY(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
+		static void setObjectGUID(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
+		static void getObjectGUID(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
 
     protected:
         // the mutex used for safe movement in all objects, hence protected and static
@@ -41,6 +59,8 @@ class Object : public sf::Shape
 
     public:
         int identifier;
+
+        std::string guid;
 
         object_body *body = nullptr;
 
@@ -76,4 +96,15 @@ class Object : public sf::Shape
         void setTexturePath(std::string texture_path);
         // returns object type string
         std::string getObjectType();
+
+        /**
+		 * This function will make this class instance accessible to scripts in
+		 * the given context. 
+		 *
+		 * IMPORTANT: Please read this definition of this function in
+		 * Object.cpp. The helper function I've provided expects certain
+		 * parameters which you must use in order to take advance of this
+		 * convinience. 
+		 */
+		v8::Local<v8::Object> exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name="default");
 };

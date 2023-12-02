@@ -2,7 +2,7 @@
 
 using json = nlohmann::json;
 
-DeathBox::DeathBox(sf::Vector2f size)
+DeathBox::DeathBox(sf::Vector2f size) : Object()
 {
     setCollisionArea();
     m_size = size;

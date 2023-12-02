@@ -2,6 +2,7 @@
 #include "../manager/eventManager.h"
 #include "../event/event.h"
 #include "../event/eventType.h"
+#include "../../ScriptManager.h"
 
 class Event;
 
@@ -48,6 +49,7 @@ class CharSpawnHandler : public EventHandler
 
 class InputHandler : public EventHandler
 {
+
     public:
         // Constructors
         InputHandler();

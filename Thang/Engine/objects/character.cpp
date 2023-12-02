@@ -4,7 +4,7 @@
 
 using json = nlohmann::json;
 
-Character::Character(size_t radius ,float speed, float accel, float jump_speed)
+Character::Character(size_t radius ,float speed, float accel, float jump_speed) : Object()
 {
     Object::setBody(true); // physics affected body
     Object::setVisible(); // allows to be drawn

@@ -7,7 +7,7 @@ inline bool instanceof(const T *ptr) {
    return dynamic_cast<const Base*>(ptr) != nullptr;
 }
 
-Platform::Platform(sf::Vector2f size)
+Platform::Platform(sf::Vector2f size) : Object()
 {
     Object::setBody(false); // not physics affected body
     Object::setVisible();

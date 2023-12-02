@@ -8,6 +8,8 @@
 #include <iostream>
 #include <v8.h>
 #include <libplatform/libplatform.h>
+#include "ScriptManager.h"
+#include "v8helpers.h"
 
 using json = nlohmann::json;
 
@@ -136,12 +138,15 @@ int main(int argc, char const *argv[])
 
 		// Best practice to isntall all global functions in the context ahead of time.
         v8::Local<v8::ObjectTemplate> global = v8::ObjectTemplate::New(isolate);
-        // // Bind the global 'print' function to the C++ Print callback.
-        // global->Set(isolate, "print", v8::FunctionTemplate::New(isolate, v8helpers::Print));
+
+        // Bind the global 'print' function to the C++ Print callback.
+        global->Set(isolate, "print", v8::FunctionTemplate::New(isolate, v8helpers::Print));
+
 		// // Bind the global static factory function for creating new GameObject instances
 		// global->Set(isolate, "gameobjectfactory", v8::FunctionTemplate::New(isolate, GameObject::ScriptedGameObjectFactory));
-		// // Bind the global static function for retrieving object handles
-		// global->Set(isolate, "gethandle", v8::FunctionTemplate::New(isolate, ScriptManager::getHandleFromScript));
+		
+        // Bind the global static function for retrieving object handles
+		global->Set(isolate, "gethandle", v8::FunctionTemplate::New(isolate, ScriptManager::getHandleFromScript));
 
         //                      global->Set(isolate, name of function inside of js, v8::Function Template::New(isolate, the function from c++ that will be under the given name))
 
@@ -155,26 +160,26 @@ int main(int argc, char const *argv[])
 
         //                                                These add scripts (.js files) so that they can be called from here (in C++)
 
-        // sm->addScript("hello_world", "scripts/hello_world.js");
+        sm->addScript("hello_world", "scripts/hello_world.js");
         // sm->addScript("perform_function", "scripts/perform_function.js");
 
-		// Create a new context
-		v8::Local<v8::Context> object_context = v8::Context::New(isolate, NULL, global);
-		sm->addContext(isolate, object_context, "object_context");
+		// // Create a new context
+		// v8::Local<v8::Context> object_context = v8::Context::New(isolate, NULL, global);
+		// sm->addContext(isolate, object_context, "object_context");
 
-		GameObject *go = new GameObject();
-		go->exposeToV8(isolate, object_context);
+		// // GameObject *go = new GameObject();
+		// // go->exposeToV8(isolate, object_context);
 
 		// With the "object_context" parameter, these scripts are put in a
 		// different context than the prior three scripts
-		sm->addScript("create_object", "scripts/create_object.js", "object_context");
-		sm->addScript("random_object", "scripts/random_object.js", "object_context");
-		sm->addScript("random_position", "scripts/random_position.js", "object_context");
-		sm->addScript("modify_position", "scripts/modify_position.js", "object_context");
+		// sm->addScript("create_object", "scripts/create_object.js", "object_context");
+		// sm->addScript("random_object", "scripts/random_object.js", "object_context");
+		// sm->addScript("random_position", "scripts/random_position.js", "object_context");
+		// sm->addScript("modify_position", "scripts/modify_position.js", "object_context");
 
 		// Use the following 4 lines in place of the above 4 lines as the
 		// reference if you don't plan to use multiple contexts
-		/* sm->addScript("create_object", "scripts/create_object.js"); */
+		// sm->addScript("create_object", "scripts/create_object.js");
 		/* sm->addScript("random_object", "scripts/random_object.js"); */
 		/* sm->addScript("random_position", "scripts/random_position.js"); */
 		/* sm->addScript("modify_position", "scripts/modify_position.js"); */
@@ -182,6 +187,8 @@ int main(int argc, char const *argv[])
         // sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Window", sf::Style::Resize);
         // // change the position of the window (relatively to the desktop)
         // window.setPosition(sf::Vector2i(50, 50));
+
+        std::cout << "jfas" << std::endl;
 
 
         TimeManager *timeManager = TimeManager::get();
@@ -193,16 +200,40 @@ int main(int argc, char const *argv[])
 
         ObjectManager *objectManager = ObjectManager::get();
 
+        std::cout << "jfas" << std::endl;
+
         Platform morb(sf::Vector2f(120.f, 25.f));
+
+        std::cout << "jfas" << std::endl;
+
         morb.setPosition(215.f, 250.f);
+
+        std::cout << "jfas" << std::endl;
+
         std::vector<sf::Vector2f> morb_set;
         morb_set.push_back(sf::Vector2f(215.f, 450.f));
+
+        std::cout << "jfas" << std::endl;
+
+
         morb_set.push_back(sf::Vector2f(215.f, 250.f));
-        morb.setToGo(morb_set);
+        std::cout << "jfas" << std::endl;
+        // morb.setToGo(morb_set);
+        std::cout << "jfas" << std::endl;
         morb.setSpeed(2);
+        std::cout << "jfas" << std::endl;
         morb.setFillColor(sf::Color::Blue);
 
+        std::cout << "jfas" << std::endl;
+
         objectManager->addObject(&morb);
+
+        std::cout << "jfas" << std::endl;
+
+
+        morb.exposeToV8(isolate, default_context);
+
+        std::cout << "jfas" << std::endl;
 
         Platform borb(sf::Vector2f(120.f, 25.f));
         borb.setPosition(375.f, 450.f);
@@ -216,6 +247,7 @@ int main(int argc, char const *argv[])
         borb.setFillColor(sf::Color(166, 126, 18));
 
         objectManager->addObject(&borb);
+        borb.exposeToV8(isolate, default_context);
 
         Platform ground(sf::Vector2f(600.f, 25.f));
         ground.setPosition(0, 600 - 25);
@@ -223,6 +255,7 @@ int main(int argc, char const *argv[])
         
 
         objectManager->addObject(&ground);
+        ground.exposeToV8(isolate, default_context);
 
         Platform ground_again(sf::Vector2f(550.f, 25.f));
         ground_again.setPosition(650, 600 - 25);
@@ -230,6 +263,7 @@ int main(int argc, char const *argv[])
         
 
         objectManager->addObject(&ground_again);
+        ground_again.exposeToV8(isolate, default_context);
 
 
         Platform wall(sf::Vector2f(25.f, 600-25));
@@ -237,21 +271,25 @@ int main(int argc, char const *argv[])
         wall.setFillColor(sf::Color::Red);
 
         objectManager->addObject(&wall);
+        wall.exposeToV8(isolate, default_context);
 
         SpawnPoint spawner;
         spawner.setPosition(200, 550);
 
         objectManager->addObject(&spawner);
+        spawner.exposeToV8(isolate, default_context);
 
         SpawnPoint spawner2;
         spawner2.setPosition(800, 550);
 
         objectManager->addObject(&spawner2);
+        spawner2.exposeToV8(isolate, default_context);
 
         DeathBox pit(sf::Vector2f(1800.f, 50.f));
         pit.setPosition(0, 650);
 
         objectManager->addObject(&pit);
+        pit.exposeToV8(isolate, default_context);
 
         std::vector<Character*> characters;
 
@@ -267,12 +305,18 @@ int main(int argc, char const *argv[])
 
         EventManager *eventManager = EventManager::get();
 
+        std::cout << "jfas" << std::endl;
+
         eventManager->addEventToHandler(std::list<EventType> {CHARACTER_COLLISION}, new CharCollideHandler);
         eventManager->addEventToHandler(std::list<EventType> {CHARACTER_DEATH}, new CharDeathHandler);
         eventManager->addEventToHandler(std::list<EventType> {CHARACTER_SPAWN}, new CharSpawnHandler);
         eventManager->addEventToHandler(std::list<EventType> {USER_INPUT}, new InputHandler);
         eventManager->addEventToHandler(std::list<EventType> {PAUSE}, new PauseHandler);
         eventManager->addEventToHandler(std::list<EventType> {CYCLE_SPEED}, new SpeedHandler);
+        
+        // ScriptManager::get()->runOne("hello_world", false);
+
+        std::cout << "bornana" << std::endl;
 
 
         // do not ask why this is necessary, IF I WERE TO CREATE 1 MORE OBJECT, THEY WOULD NOT APPEAR
@@ -304,6 +348,7 @@ int main(int argc, char const *argv[])
                     objectManager->updateObjects();
                 }
 
+
                 // window.clear(sf::Color::Black);
 
                 // for (auto & [key, value] : objectManager->getObjects()) {
@@ -313,5 +358,10 @@ int main(int argc, char const *argv[])
             }
         }
     }
+
+    isolate->Dispose();
+    v8::V8::Dispose();
+    v8::V8::ShutdownPlatform();
+
     return 0;
 }

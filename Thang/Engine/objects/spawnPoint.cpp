@@ -2,7 +2,7 @@
 
 using json = nlohmann::json;
 
-SpawnPoint::SpawnPoint()
+SpawnPoint::SpawnPoint() : Object()
 {
     object_type = std::string("SpawnPoint");
     sf::Shape::update();
