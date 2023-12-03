@@ -261,6 +261,32 @@ std::vector<Object*> ObjectManager::overlappedPhysics(Object *object)
     return touchers;
 }
 
+void ObjectManager::areObjectsBelow(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    if (args.Length() == 1 && args[0]->IsObject()) {
+        v8::Local<v8::Object> obj_obj = args[0].As<v8::Object>();
+
+        v8::External *external = v8::External::Cast(*obj_obj->GetInternalField(0));
+        void* ptr = external->Value();
+        Object* object = static_cast<Object*>(ptr);
+
+        bool lean = touchingBelow(object) > 0;
+        args.GetReturnValue().Set(lean);
+    }
+}
+
+void ObjectManager::areObjectsAbove(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    if (args.Length() == 1 && args[0]->IsObject()) {
+        v8::Local<v8::Object> obj_obj = args[0].As<v8::Object>();
+
+        v8::External *external = v8::External::Cast(*obj_obj->GetInternalField(0));
+        void* ptr = external->Value();
+        Object* object = static_cast<Object*>(ptr);
+
+        bool lean = touchingAbove(object) > 0;
+        args.GetReturnValue().Set(lean);
+    }
+}
+
 //The five below functions just find all of the physicsAffect objects that are touching a certain object
 //Utilizing the isOverlapped function in Object
 std::vector<Object*> ObjectManager::touchingPhysics(Object *object)

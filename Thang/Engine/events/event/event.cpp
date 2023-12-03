@@ -18,6 +18,10 @@ EventType Event::getType() {
     return type;
 }
 
+void Event::setType(EventType type) {
+    this->type = type;
+}
+
 int64_t Event::getStamp() {
     return time_stamp;
 }
@@ -26,6 +30,30 @@ json Event::clientJSONHelper() {
     json output;
     output["Type"] = type;
     return output;
+}
+
+void Event::setEventType(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
+{
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+    static_cast<Event*>(ptr)->setType(static_cast<EventType>(value->Int32Value()));
+}
+
+void Event::getEventType(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
+{
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+    int x_event_type = static_cast<Event*>(ptr)->getType();
+    info.GetReturnValue().Set(x_event_type);
+}
+
+v8::Local<v8::Object> Event::exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name)
+{
+	std::vector<v8helpers::ParamContainer<v8::AccessorGetterCallback, v8::AccessorSetterCallback>> v;
+	v.push_back(v8helpers::ParamContainer("type", getTypeScripting, setTypeScripting));
+	return v8helpers::exposeToV8("event1", this, v, isolate, context, context_name);
 }
 
 // Character collision implementation

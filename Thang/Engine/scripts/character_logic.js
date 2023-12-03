@@ -9,12 +9,12 @@ var character = gethandle(Object0.curr_guid)
 //  This is the logic for non-input based movement
 
 
-if (objectsAreAbove(character)) {
+if (areObjectsAbove(character)) {
     character.velY = -DOWN_ACCEL * delta_time
-} else if (objectsAreBelow(character)) {
+} else if (areObjectsBelow(character)) {
     character.velY = -DOWN_ACCEL * delta_time
-} else if (objectsAreBelow(character)) {
+} else if (character.velY > TERM_VEL) {
     character.velY -= DOWN_ACCEL * delta_time
 }
 
-moveObject(character, 0, y)
+moveObject(character)

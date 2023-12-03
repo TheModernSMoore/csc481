@@ -50,21 +50,8 @@ sf::Vector2f Character::getPoint(std::size_t index) const
 // This handles gravity
 void Character::logic()
 {
-    TimeManager *timeManager = TimeManager::get();
-    Timeline *localTime = timeManager->getTimelines().at(1);
-    float delta_time = localTime->deltaTime();
-    //I think this kind of check is ok to not be immediately reliant, could be cringe
-    ObjectManager *objectManager = ObjectManager::get();
-    std::vector<Object*> objectsBelow = objectManager->touchingBelow(this);
-    std::vector<Object*> objectsAbove = objectManager->touchingAbove(this);
-    if (objectsAbove.size() > 0) {
-        body->velocity.y = -DOWN_ACCEL * delta_time;
-    } else if (objectsBelow.size() > 0) {
-        body->velocity.y = -DOWN_ACCEL * delta_time;
-    } else if (body->velocity.y > TERM_VEL) {
-        body->velocity.y -= DOWN_ACCEL * delta_time;
-    }
-    move(0, TERM_VEL <= body->velocity.y ? -body->velocity.y * delta_time : -TERM_VEL * delta_time);
+    current_guid = guid;
+    ScriptManager::get()->runOne("character_logic", false);
 }
 
 // This handles all input and corresponding movement
@@ -77,19 +64,20 @@ void Character::input(std::string direction)
         if (body->velocity.x > 0) {
             body->velocity.x = 0;
         }
-        move(body->velocity.x <= speed * -1 ? body->velocity.x * delta_time : (body->velocity.x -= accel * delta_time) * delta_time, 0);
+        // move(body->velocity.x <= speed * -1 ? body->velocity.x * delta_time : (body->velocity.x -= accel * delta_time) * delta_time, 0);
+        body->velocity.x = body->velocity.x <= speed * -1 ? body->velocity.x : (body->velocity.x - accel * delta_time);
     } else if (direction.find("r") != std::string::npos) {
         if (body->velocity.x < 0) {
             body->velocity.x = 0;
         }
-        move(body->velocity.x >= speed ? body->velocity.x * delta_time : (body->velocity.x += accel * delta_time) * delta_time, 0);
+        // move(body->velocity.x >= speed ? body->velocity.x * delta_time : (body->velocity.x += accel * delta_time) * delta_time, 0);
+        body->velocity.x = body->velocity.x >= speed ? body->velocity.x : (body->velocity.x + accel * delta_time);
     }
     ObjectManager *objectManager = ObjectManager::get();
     std::vector<Object*> objectsBelow = objectManager->touchingBelow(this);
     // SHOULD PROBABLY JUST HAVE A ON GROUND FUNCTION
     if (objectsBelow.size() > 0 && direction.find("u") != std::string::npos) {
-        body->velocity.y = jump_speed * delta_time;
-        move(0, -body->velocity.y);
+        body->velocity.y = jump_speed;
     }
 }
 

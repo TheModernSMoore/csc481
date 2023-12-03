@@ -12,6 +12,10 @@ class SpawnPoint;
 
 class Event
 {
+    private:
+    	static void setEventType(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
+		static void getEventType(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
+
     protected:
         // The enumerable type of the event
         EventType type;
@@ -29,9 +33,22 @@ class Event
 
         EventType getType();
 
+        void setType(EventType type);
+
         int64_t getStamp();
 
         bool operator>(const Event& other) const;
+
+        /**
+		 * This function will make this class instance accessible to scripts in
+		 * the given context. 
+		 *
+		 * IMPORTANT: Please read this definition of this function in
+		 * Object.cpp. The helper function I've provided expects certain
+		 * parameters which you must use in order to take advance of this
+		 * convinience. 
+		 */
+		v8::Local<v8::Object> exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name="default");
 
 };
 

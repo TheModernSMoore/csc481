@@ -68,6 +68,10 @@ class ObjectManager
 
         std::vector<Object*> touchingAbove(Object *object);
 
+        static void areObjectsBelow(const v8::FunctionCallbackInfo<v8::Value>& args);
+
+        static void areObjectsAbove(const v8::FunctionCallbackInfo<v8::Value>& args);
+
         //The five below functions just find all of the physicsAffect objects that are touching a certain object
         //Utilizing the isTouching function in Object
         std::vector<Object*> overlappedPhysics(Object *object);

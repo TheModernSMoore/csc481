@@ -148,6 +148,12 @@ int main(int argc, char const *argv[])
         // Bind the global static function for retrieving object handles
 		global->Set(isolate, "gethandle", v8::FunctionTemplate::New(isolate, ScriptManager::getHandleFromScript));
 
+        global->Set(isolate, "moveObject", v8::FunctionTemplate::New(isolate, Object::scriptMove));
+
+        global->Set(isolate, "areObjectsBelow", v8::FunctionTemplate::New(isolate, Object::areObjectsBelow));
+
+        global->Set(isolate, "areObjectsAbove", v8::FunctionTemplate::New(isolate, Object::areObjectsAbove));
+
         //                      global->Set(isolate, name of function inside of js, v8::Function Template::New(isolate, the function from c++ that will be under the given name))
 
 
@@ -161,6 +167,7 @@ int main(int argc, char const *argv[])
         //                                                These add scripts (.js files) so that they can be called from here (in C++)
 
         sm->addScript("hello_world", "scripts/hello_world.js");
+        sm->addScript("character_logic", "scripts/character_logic.js");
         // sm->addScript("perform_function", "scripts/perform_function.js");
 
 		// // Create a new context

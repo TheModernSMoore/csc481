@@ -103,6 +103,20 @@ void Object::move(float offsetX, float offsetY) {
     }
 }
 
+void Object::scriptMove(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    if (args.Length() == 1 && args[0]->IsObject()) {
+        v8::Local<v8::Object> obj_obj = args[0].As<v8::Object>();
+
+        v8::External *external = v8::External::Cast(*obj_obj->GetInternalField(0));
+        void* ptr = external->Value();
+        Object* object = static_cast<Object*>(ptr);
+        TimeManager *timeManager = TimeManager::get();
+        Timeline *localTime = timeManager->getTimelines().at(1);
+        float delta_time = localTime->deltaTime();
+        object->move(object->body->velocity.x * delta_time, object->body->velocity.y * delta_time);
+    }
+}
+
 void Object::setBody(bool affected)
 {
     body = new object_body;

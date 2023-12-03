@@ -97,6 +97,9 @@ class Object : public sf::Shape
         virtual void logic() = 0;
         // Overwrites move and does different behavior based off of components
         virtual void move(float offsetX, float offsetY);
+        // Script move function
+        static void scriptMove(const v8::FunctionCallbackInfo<v8::Value>& args);
+
         // 
         void setTexturePath(std::string texture_path);
         // returns object type string
