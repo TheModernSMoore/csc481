@@ -1,5 +1,7 @@
 #include "timeline.h"
 
+#include "../v8helpers.h"
+
 
 Timeline::Timeline(Timeline *anchor, int64_t tic)
 {
@@ -95,4 +97,47 @@ void Timeline::setTic(int64_t newTic)
     last_time = last_time * tic / newTic;
     current_time = current_time * tic / newTic;
     tic = newTic;
+}
+
+void Timeline::setTimePause(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
+{
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+    static_cast<Timeline*>(ptr)->paused = value->Int32Value();
+}
+
+void Timeline::getTimePause(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
+{
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+    int paused = static_cast<Timeline*>(ptr)->isPaused();
+    info.GetReturnValue().Set(paused);
+}
+
+void Timeline::setDeltaTime(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info)
+{
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+    static_cast<Timeline*>(ptr)->delta_time = value->Int32Value();
+}
+
+void Timeline::getDeltaTime(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info)
+{
+	v8::Local<v8::Object> self = info.Holder();
+	v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
+	void* ptr = wrap->Value();
+    float delta_time = static_cast<Timeline*>(ptr)->delta_time;
+    info.GetReturnValue().Set(delta_time);
+}
+
+v8::Local<v8::Object> Timeline::exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name)
+{
+	std::vector<v8helpers::ParamContainer<v8::AccessorGetterCallback, v8::AccessorSetterCallback>> v;
+	v.push_back(v8helpers::ParamContainer("paused", getTimePause, setTimePause));
+    v.push_back(v8helpers::ParamContainer("deltaTime", getDeltaTime, setDeltaTime));
+
+	return v8helpers::exposeToV8("localTime", this, v, isolate, context, context_name);
 }

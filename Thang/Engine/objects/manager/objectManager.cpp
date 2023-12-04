@@ -153,13 +153,16 @@ void ObjectManager::genericLogicWrapper()
 
 void ObjectManager::updateObjects()
 {
-    std::vector<std::thread> threads;
-    // threading the logic of the objects
-    threads.push_back(std::thread(physicsLogicWrapper));
-    threads.push_back(std::thread(genericLogicWrapper));
-    for (auto & thread : threads) {
-        thread.join();
+    for(auto & [key, physics] : objects) {
+        physics->logic();   //                   Seg faults explicitly on call to character->logic()
     }
+    // std::vector<std::thread> threads;
+    // threading the logic of the objects
+//     threads.push_back(std::thread(physicsLogicWrapper));
+//     threads.push_back(std::thread(genericLogicWrapper));
+//     for (auto & thread : threads) {
+//         thread.join();
+//     }
 }
 
 std::vector<Object*> ObjectManager::overlapped(Object *object)
@@ -269,7 +272,7 @@ void ObjectManager::areObjectsBelow(const v8::FunctionCallbackInfo<v8::Value>& a
         void* ptr = external->Value();
         Object* object = static_cast<Object*>(ptr);
 
-        bool lean = touchingBelow(object) > 0;
+        bool lean = ObjectManager::get()->touchingBelow(object).size() > 0;
         args.GetReturnValue().Set(lean);
     }
 }
@@ -282,7 +285,7 @@ void ObjectManager::areObjectsAbove(const v8::FunctionCallbackInfo<v8::Value>& a
         void* ptr = external->Value();
         Object* object = static_cast<Object*>(ptr);
 
-        bool lean = touchingAbove(object) > 0;
+        bool lean = ObjectManager::get()->touchingAbove(object).size() > 0;
         args.GetReturnValue().Set(lean);
     }
 }

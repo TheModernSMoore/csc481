@@ -1,5 +1,8 @@
 #include "event.h"
 
+#include "../../ScriptManager.h"
+#include "../../v8helpers.h"
+
 using json = nlohmann::json;
 
 // Abstract Event implementation
@@ -52,7 +55,7 @@ void Event::getEventType(v8::Local<v8::String> property, const v8::PropertyCallb
 v8::Local<v8::Object> Event::exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name)
 {
 	std::vector<v8helpers::ParamContainer<v8::AccessorGetterCallback, v8::AccessorSetterCallback>> v;
-	v.push_back(v8helpers::ParamContainer("type", getTypeScripting, setTypeScripting));
+	v.push_back(v8helpers::ParamContainer("type", getEventType, setEventType));
 	return v8helpers::exposeToV8("event1", this, v, isolate, context, context_name);
 }
 

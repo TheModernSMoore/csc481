@@ -51,7 +51,8 @@ sf::Vector2f Character::getPoint(std::size_t index) const
 void Character::logic()
 {
     current_guid = guid;
-    ScriptManager::get()->runOne("character_logic", false);
+    ScriptManager *sm = ScriptManager::get();
+    sm->runOne("character_logic", true);
 }
 
 // This handles all input and corresponding movement
@@ -72,6 +73,8 @@ void Character::input(std::string direction)
         }
         // move(body->velocity.x >= speed ? body->velocity.x * delta_time : (body->velocity.x += accel * delta_time) * delta_time, 0);
         body->velocity.x = body->velocity.x >= speed ? body->velocity.x : (body->velocity.x + accel * delta_time);
+    } else {
+        body->velocity.x = 0;
     }
     ObjectManager *objectManager = ObjectManager::get();
     std::vector<Object*> objectsBelow = objectManager->touchingBelow(this);

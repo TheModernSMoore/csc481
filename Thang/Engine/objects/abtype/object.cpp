@@ -22,7 +22,6 @@ Object::Object()
     identifier = objects_made++;
     guid = std::string("Object") + std::to_string(identifier);
     current_guid = guid;
-    ScriptManager::get()->runOne("hello_world", false);
 }
 
 std::string Object::getObjectType()

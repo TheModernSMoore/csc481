@@ -18,7 +18,7 @@ inline bool instanceof(const T *ptr) {
    return dynamic_cast<const Base*>(ptr) != nullptr;
 }
 
-void clientMessaging(int client_number, std::vector<std::string> *inputs, std::mutex *m, std::vector<Character*> *characters)
+void clientMessaging(int client_number, std::vector<std::string> *inputs, std::mutex *m, std::vector<Character*> *characters, v8::Isolate *isolate, v8::Local<v8::Context> *default_context)
 {
     Character *man = new Character(20, 5, 0.5, 10);
     man->setPosition(400.f, 150.f);
@@ -30,6 +30,8 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
         objectManager->addObject(man);
         characters->push_back(man);
         inputs->push_back(std::string("")); // this will be at clients_connected - 1
+
+        man->exposeToV8(isolate, *default_context);
     }
     character_ident = man->identifier;
 
@@ -59,7 +61,9 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
             json recved_json = json::parse(input_message.to_string());
             EventManager *eventManager = EventManager::get();
             if (recved_json["Type"] == PAUSE) {
-                eventManager->raise(new Pause);
+                Event *pauseEvent = new Pause;
+                eventManager->raise(pauseEvent);
+                pauseEvent->exposeToV8(isolate, *default_context);
                 comsock.send(zmq::buffer("ok"));
             } else if (recved_json["Type"] == CYCLE_SPEED) {
                 eventManager->raise(new CycleSpeed);
@@ -92,7 +96,7 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
     }
 }
 
-void clientCreation(int *clients_connected, std::vector<std::string> *inputs, std::mutex *m, std::vector<Character*> *characters)
+void clientCreation(int *clients_connected, std::vector<std::string> *inputs, std::mutex *m, std::vector<Character*> *characters, v8::Isolate *isolate, v8::Local<v8::Context> *default_context)
 {
     // (construct the socket for that as well)
     std::vector<std::thread> life_extender;  
@@ -107,7 +111,7 @@ void clientCreation(int *clients_connected, std::vector<std::string> *inputs, st
             (*clients_connected) ++;
         }
         // MUST EXTEND THIS THREADS LIFE
-        life_extender.push_back(std::thread(clientMessaging, *clients_connected, inputs, m, characters));
+        life_extender.push_back(std::thread(clientMessaging, *clients_connected, inputs, m, characters, isolate, default_context));
         connect_checker.send(zmq::buffer(std::to_string(*clients_connected)));
     }
 }
@@ -150,9 +154,9 @@ int main(int argc, char const *argv[])
 
         global->Set(isolate, "moveObject", v8::FunctionTemplate::New(isolate, Object::scriptMove));
 
-        global->Set(isolate, "areObjectsBelow", v8::FunctionTemplate::New(isolate, Object::areObjectsBelow));
+        global->Set(isolate, "areObjectsBelow", v8::FunctionTemplate::New(isolate, ObjectManager::areObjectsBelow));
 
-        global->Set(isolate, "areObjectsAbove", v8::FunctionTemplate::New(isolate, Object::areObjectsAbove));
+        global->Set(isolate, "areObjectsAbove", v8::FunctionTemplate::New(isolate, ObjectManager::areObjectsAbove));
 
         //                      global->Set(isolate, name of function inside of js, v8::Function Template::New(isolate, the function from c++ that will be under the given name))
 
@@ -168,6 +172,7 @@ int main(int argc, char const *argv[])
 
         sm->addScript("hello_world", "scripts/hello_world.js");
         sm->addScript("character_logic", "scripts/character_logic.js");
+        sm->addScript("handle_pause", "scripts/handle_pause.js");
         // sm->addScript("perform_function", "scripts/perform_function.js");
 
 		// // Create a new context
@@ -195,12 +200,13 @@ int main(int argc, char const *argv[])
         // // change the position of the window (relatively to the desktop)
         // window.setPosition(sf::Vector2i(50, 50));
 
-        std::cout << "jfas" << std::endl;
-
 
         TimeManager *timeManager = TimeManager::get();
         Timeline realTime = Timeline();
         Timeline localTime = Timeline(&realTime, 65000);
+
+        localTime.exposeToV8(isolate, default_context);
+
         timeManager->addTimeline(&realTime);
         timeManager->addTimeline(&localTime);
 
@@ -219,8 +225,6 @@ int main(int argc, char const *argv[])
         objectManager->addObject(&morb);
         morb.exposeToV8(isolate, default_context);
 
-        sm->runOne("create_object", false);
-
         Platform borb(sf::Vector2f(120.f, 25.f));
         borb.setPosition(375.f, 450.f);
         std::vector<sf::Vector2f> borb_set;
@@ -235,7 +239,6 @@ int main(int argc, char const *argv[])
         objectManager->addObject(&borb);
         borb.exposeToV8(isolate, default_context);
 
-        sm->runOne("create_object", false);
 
         Platform ground(sf::Vector2f(600.f, 25.f));
         ground.setPosition(0, 600 - 25);
@@ -245,7 +248,6 @@ int main(int argc, char const *argv[])
         objectManager->addObject(&ground);
         ground.exposeToV8(isolate, default_context);
 
-        sm->runOne("create_object", false);
 
         Platform ground_again(sf::Vector2f(550.f, 25.f));
         ground_again.setPosition(650, 600 - 25);
@@ -290,12 +292,11 @@ int main(int argc, char const *argv[])
         std::vector<std::string> inputs;
         int clients_connected = 0;
 
-        std::thread client_creator(clientCreation, &clients_connected, &inputs, &m, &characters);
+        std::thread client_creator(clientCreation, &clients_connected, &inputs, &m, &characters, isolate, &default_context);
 
 
         EventManager *eventManager = EventManager::get();
 
-        std::cout << "jfas" << std::endl;
 
         eventManager->addEventToHandler(std::list<EventType> {CHARACTER_COLLISION}, new CharCollideHandler);
         eventManager->addEventToHandler(std::list<EventType> {CHARACTER_DEATH}, new CharDeathHandler);
@@ -306,7 +307,6 @@ int main(int argc, char const *argv[])
         
         // ScriptManager::get()->runOne("hello_world", false);
 
-        std::cout << "bornana" << std::endl;
 
 
         // do not ask why this is necessary, IF I WERE TO CREATE 1 MORE OBJECT, THEY WOULD NOT APPEAR

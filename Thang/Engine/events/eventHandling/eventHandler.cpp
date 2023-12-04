@@ -80,9 +80,6 @@ void InputHandler::onEvent(Event *e) {
         // Do input handling here
         // get character, and maybe not move character
         // just update it's desired direction?
-        std::cout << "jo" << std::endl;
-        ScriptManager::get()->runOne("hello_world", true);
-        std::cout << "mama" << std::endl;
 
         // Allows the game designer to create their own logic based off of the input string.
         inp->getCharacter()->input(inp->getInputString());
@@ -94,14 +91,18 @@ void InputHandler::onEvent(Event *e) {
 PauseHandler::PauseHandler() {}
 
 void PauseHandler::onEvent(Event *e) {
-    if (e->getType() == PAUSE) {
-        Timeline *local = TimeManager::get()->getTimelines().at(1);
-        if (local->isPaused()) {
-            local->unpause();
-        } else {
-            local->pause();
-        }
-    }
+    // if (e->getType() == PAUSE) {
+    //     Timeline *local = TimeManager::get()->getTimelines().at(1);
+    //     if (local->isPaused()) {
+    //         local->unpause();
+    //     } else {
+    //         local->pause();
+    //     }
+    // }
+    // ScriptManager *sm = ScriptManager::get();
+    // v8::Local<v8::Context> context = &(sm->getContextContainer("default").context);
+    // e->exposeToV8(sm->getContextContainer("default").isolate, *context);
+    ScriptManager::get()->runOne("handle_pause", false);
 }
 
 // Cycle Speed implementation

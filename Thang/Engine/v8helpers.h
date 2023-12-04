@@ -52,9 +52,6 @@ namespace v8helpers
 	template <typename R, typename G, typename S>
 	v8::Local<v8::Object> exposeToV8(std::string object_name, R *object_ref, std::vector<ParamContainer<G, S>> list_of_params, v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name="default")
 	{
-#if V8H_DEBUG
-		std::cout << "v8helpers adding " << object_name << std::endl;
-#endif
 		v8::Context::Scope context_scope(context); // Must enter the context
 		v8::EscapableHandleScope handle_scope(isolate); 
 		v8::Local<v8::ObjectTemplate> object_template = v8::ObjectTemplate::New(isolate);

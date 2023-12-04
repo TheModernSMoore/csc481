@@ -3,6 +3,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/System/Time.hpp>
 #include <cstdint>
+#include <v8.h>
 
 // #define W 5
 
@@ -32,6 +33,12 @@ class Timeline
         // index of delta time to replace
         int delt_idx = 0;
 
+        static void setTimePause(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
+		static void getTimePause(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
+        static void setDeltaTime(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
+		static void getDeltaTime(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
+        
+
     public:
         // Constructor taking in an anchor timeline and the tic size of this one
         Timeline(Timeline *anchor, int64_t tic);
@@ -53,6 +60,17 @@ class Timeline
         void cycleTic();
         // Sets the tic to the new tic and changes affected variables
         void setTic(int64_t newTic);
+
+        /**
+		 * This function will make this class instance accessible to scripts in
+		 * the given context. 
+		 *
+		 * IMPORTANT: Please read this definition of this function in
+		 * Object.cpp. The helper function I've provided expects certain
+		 * parameters which you must use in order to take advance of this
+		 * convinience. 
+		 */
+		v8::Local<v8::Object> exposeToV8(v8::Isolate *isolate, v8::Local<v8::Context> &context, std::string context_name="default");
 
 
 

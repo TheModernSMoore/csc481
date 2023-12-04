@@ -40,7 +40,11 @@ class Object : public sf::Shape
 		static void setObjectGUID(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
 		static void getObjectGUID(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
         static void setObjectCurrGUID(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
-		static void getObjectCurrGUID(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
+		static void getObjectCurrGUID(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return
+        static void setObjectVelX(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
+		static void getObjectVelX(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type
+		static void setObjectVelY(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info);
+		static void getObjectVelY(v8::Local<v8::String> property, const v8::PropertyCallbackInfo<v8::Value>& info); // note return type type
 
     protected:
         // the mutex used for safe movement in all objects, hence protected and static
