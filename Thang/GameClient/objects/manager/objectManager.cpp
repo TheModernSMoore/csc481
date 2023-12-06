@@ -128,6 +128,10 @@ int ObjectManager::parseObjJSON(nlohmann::json to_parse)
     if (type.compare("Platform") == 0) {
         dynamic_cast<Platform*>(parsed)->setNextPoint(to_parse["NextPoint"]);
     }
+    if (type.compare("Character") == 0) {
+        sf::Color color(to_parse["Color"][0], to_parse["Color"][1], to_parse["Color"][2]);
+        dynamic_cast<Character*>(parsed)->setFillColor(color);
+    }
     float x = to_parse["Position"][0];
     float y = to_parse["Position"][1];
     parsed->setPosition(x, y);

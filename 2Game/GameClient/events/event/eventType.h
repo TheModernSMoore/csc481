@@ -1,0 +1,12 @@
+#pragma once
+
+enum EventType {
+    USER_INPUT,
+    CHARACTER_COLLISION,
+    ENEMY_COLLISION,
+    CHARACTER_DEATH,
+    CHARACTER_SPAWN,
+    PAUSE,
+    CYCLE_SPEED,
+    BULLET_SHOOT
+};

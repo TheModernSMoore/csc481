@@ -75,3 +75,12 @@ class SpeedHandler : public EventHandler
         // Function that actually handles the event
         virtual void onEvent(Event *e);
 };
+
+class ColorHandler : public EventHandler
+{
+    public:
+        // Constructors
+        ColorHandler();
+        // Function that actually handles the event
+        virtual void onEvent(Event *e);
+};

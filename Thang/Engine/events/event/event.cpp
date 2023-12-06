@@ -160,3 +160,21 @@ CycleSpeed::CycleSpeed() {
 json CycleSpeed::toClientJSON() {
     return clientJSONHelper();
 }
+
+
+// Color Event implementation
+
+Color::Color(Character *color_to_change) {
+    character = color_to_change;
+    type = COLOR;
+}
+
+Character* Color::getCharacter() {
+    return character;
+}
+
+json Color::toClientJSON() {
+    json output = clientJSONHelper();
+    output["CharacterID"] = character->identifier;
+    return output;
+}

@@ -115,3 +115,20 @@ void SpeedHandler::onEvent(Event *e) {
         TimeManager::get()->getTimelines().at(1)->cycleTic();
     }
 }
+
+
+// Color changing implementation
+
+ColorHandler::ColorHandler() {}
+
+void ColorHandler::onEvent(Event *e) {
+    if (e->getType() == COLOR) {
+        Color *col = (Color *)e;
+        std::srand(std::time(nullptr));
+        int r = std::rand() % 256;
+        int g = std::rand() % 256;
+        int b = std::rand() % 256;
+        sf::Color rand_color(r, g, b);
+        col->getCharacter()->setFillColor(rand_color);
+    }
+}

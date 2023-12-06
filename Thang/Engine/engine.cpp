@@ -64,11 +64,17 @@ void clientMessaging(int client_number, std::vector<std::string> *inputs, std::m
                 Event *pauseEvent = new Pause;
                 eventManager->raise(pauseEvent);
                 pauseEvent->exposeToV8(isolate, *default_context);
+                ScriptManager::get()->runOne("raise_pause");
                 comsock.send(zmq::buffer("ok"));
             } else if (recved_json["Type"] == CYCLE_SPEED) {
                 eventManager->raise(new CycleSpeed);
                 comsock.send(zmq::buffer("ok"));
-            } else {
+            } else if (recved_json["Type"] == COLOR) {
+                Color *color = new Color(man);
+                eventManager->raise(color);
+                comsock.send(zmq::buffer("ok"));
+            }
+            else {
                 inputs->at(client_number - 1) = recved_json["Input"];
                 std::map<int, Object*> objects = objectManager->getObjects();
                 int size = objects.size();
@@ -158,6 +164,8 @@ int main(int argc, char const *argv[])
 
         global->Set(isolate, "areObjectsAbove", v8::FunctionTemplate::New(isolate, ObjectManager::areObjectsAbove));
 
+        global->Set(isolate, "raise", v8::FunctionTemplate::New(isolate, EventManager::scriptedRaise));
+
         //                      global->Set(isolate, name of function inside of js, v8::Function Template::New(isolate, the function from c++ that will be under the given name))
 
 
@@ -173,6 +181,7 @@ int main(int argc, char const *argv[])
         sm->addScript("hello_world", "scripts/hello_world.js");
         sm->addScript("character_logic", "scripts/character_logic.js");
         sm->addScript("handle_pause", "scripts/handle_pause.js");
+        sm->addScript("raise_pause", "scripts/raise_pause.js");
         // sm->addScript("perform_function", "scripts/perform_function.js");
 
 		// // Create a new context
@@ -304,6 +313,7 @@ int main(int argc, char const *argv[])
         eventManager->addEventToHandler(std::list<EventType> {USER_INPUT}, new InputHandler);
         eventManager->addEventToHandler(std::list<EventType> {PAUSE}, new PauseHandler);
         eventManager->addEventToHandler(std::list<EventType> {CYCLE_SPEED}, new SpeedHandler);
+        eventManager->addEventToHandler(std::list<EventType> {COLOR}, new ColorHandler);
         
         // ScriptManager::get()->runOne("hello_world", false);
 

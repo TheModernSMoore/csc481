@@ -6,5 +6,6 @@ enum EventType {
     CHARACTER_DEATH,
     CHARACTER_SPAWN,
     PAUSE,
-    CYCLE_SPEED
+    CYCLE_SPEED,
+    COLOR
 };

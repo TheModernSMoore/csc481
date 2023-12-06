@@ -62,3 +62,15 @@ void EventManager::handleEvents() {
         delete current;
     }
 }
+
+void EventManager::scriptedRaise(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    if (args.Length() == 1 && args[0]->IsObject()) {
+        v8::Local<v8::Object> event_obj = args[0].As<v8::Object>();
+
+        v8::External *external = v8::External::Cast(*event_obj->GetInternalField(0));
+        void* ptr = external->Value();
+        Event* event = static_cast<Event*>(ptr);
+
+        EventManager::get()->raise(event);
+    }
+}

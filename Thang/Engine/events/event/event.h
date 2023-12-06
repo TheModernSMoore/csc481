@@ -143,3 +143,17 @@ class CycleSpeed : public Event
         // To json function
         virtual nlohmann::json toClientJSON();
 };
+
+
+class Color : public Event
+{
+    private:
+        Character *character;
+
+    public:
+        Color(Character *color_to_change);
+        // gets the character
+        Character* getCharacter();
+        // To json function
+        virtual nlohmann::json toClientJSON();
+};

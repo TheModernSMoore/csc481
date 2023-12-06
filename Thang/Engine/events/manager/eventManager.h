@@ -33,4 +33,6 @@ class EventManager
         void raise(nlohmann::json jevent);
         // This will get called every update cycle
         void handleEvents();
+        // This raises an event from scripts
+        static void scriptedRaise(const v8::FunctionCallbackInfo<v8::Value>& args);
 };

@@ -5,6 +5,8 @@
 #include <iostream>
 #include "objects/manager/objectManager.h"
 #include "timeline/timeManager.h"
+#include <chrono>
+#include <thread>
 
 using json = nlohmann::json;
 
@@ -75,14 +77,15 @@ int main(int argc, char const *argv[])
         std::cout << "cringe " << character_ident << std::endl;
     };
 
+    
+    int input_timer = 3;
+    bool p_press = false;
+    bool esc_press = false;
     bool in_focus = true;
-    bool paused = false;
-
     Character *my_character = nullptr;
 
-    // // do not ask why this is necessary, IF I WERE TO CREATE 1 MORE OBJECT, THEY WOULD NOT APPEAR
-    // // AND THIS FIXED IT
-    // for (int i = 0; i < W; i++)  
+
+    // for (int i = 0; i < 5; i++)  
     // {
     //     realTime.setTime();
     //     localTime.setTime();
@@ -98,32 +101,58 @@ int main(int argc, char const *argv[])
         sf::Event event;
         while (window.pollEvent(event))
         {
+            if (event.type == sf::Event::KeyPressed) {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::P)) {
+                    p_press = true;
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+                    esc_press = true;
+                }
+            }
             // "close requested" event: we close the window
             if (event.type == sf::Event::Closed)
                 window.close();
-            if (event.type == sf::Event::KeyPressed) {
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::P)) {
+            if (event.type == sf::Event::LostFocus)
+                in_focus = false;
+            else if (event.type == sf::Event::GainedFocus)
+                in_focus = true;
+        }
+
+        if (p_press || esc_press) {
+            // std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            if (input_timer <= 0) {
+                if (p_press && esc_press) {
+                    json color_json;
+                    color_json["Type"] = COLOR;
+                    mainket.send(zmq::buffer(to_string(color_json)));
+                    zmq::message_t idc;
+                    auto res = mainket.recv(idc);
+                    input_timer = 3;
+                    p_press = false;
+                    esc_press = false;
+                } else if (p_press) {
                     // Create Cycle Speed event
                     json speed_json;
                     speed_json["Type"] = CYCLE_SPEED;
                     mainket.send(zmq::buffer(to_string(speed_json)));
                     zmq::message_t idc;
                     auto res = mainket.recv(idc);
-                }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+                    input_timer = 3;
+                    p_press = false;
+                } else if (esc_press) {
                     // Create Pause Time event
                     json pause_json;
                     pause_json["Type"] = PAUSE;
                     mainket.send(zmq::buffer(to_string(pause_json)));
                     zmq::message_t idc;
                     auto res = mainket.recv(idc);
+                    input_timer = 3;
+                    esc_press = false;
                 }
+            } else {
+                // I know this is uber sus but I think my timeline is uber sus
+                input_timer -= 1;
             }
-            if (event.type == sf::Event::LostFocus)
-                in_focus = false;
-            else if (event.type == sf::Event::GainedFocus)
-                in_focus = true;
-                
         }
 
         if(in_focus) {
